@@ -1,0 +1,26 @@
+{
+  "name": "granola-ts-client",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {".": "./dist/index.js"},
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "generate": "openapi-typescript openapi.yaml -o src/schema.d.ts",
+    "build": "bun build src/index.ts --outdir dist",
+    "test": "bun test",
+    "format": "biome format . --write",
+    "lint": "biome check .",
+    "docs": "typedoc --entryPoints src/index.ts --out docs",
+    "ci": "bun run lint && bun run test && bun run build && bun run docs"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/bun": "latest",
+    "biome": "^0.3.3",
+    "openapi-typescript": "^7.6.1",
+    "typedoc": "^0.28.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
