@@ -8,11 +8,13 @@ async function main() {
     
     // Get workspaces
     const workspaces = await client.getWorkspaces();
-    console.log(`Found ${workspaces.workspaces.length} workspaces`);
+    const workspaceCount = workspaces.workspaces?.length ?? 0;
+    console.log(`Found ${workspaceCount} workspaces`);
     
     // Get documents from the first workspace
-    if (workspaces.workspaces.length > 0) {
-      const workspaceId = workspaces.workspaces[0].workspace.workspace_id;
+    if (workspaces.workspaces && workspaces.workspaces.length > 0) {
+      const firstWorkspace = workspaces.workspaces[0];
+      const workspaceId = firstWorkspace.workspace.workspace_id;
       const docs = await client.getDocuments({ workspace_id: workspaceId, limit: 5 });
       
       console.log(`First 5 documents in workspace ${workspaceId}:`);
