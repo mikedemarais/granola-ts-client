@@ -1,6 +1,11 @@
 // tests/http.test.ts
-import { describe, it, expect, beforeEach } from 'bun:test';
+import { describe, it, expect, beforeEach, beforeAll, afterAll } from 'bun:test';
 import { Http } from '../src/http';
+
+// Set NODE_ENV for testing
+beforeAll(() => {
+  process.env.NODE_ENV = 'test';
+});
 
 describe('Http client', () => {
   let originalFetch: typeof fetch;
