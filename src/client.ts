@@ -13,34 +13,63 @@ type PanelTemplate = components['schemas']['PanelTemplate'];
 type Document = components['schemas']['Document'];
 
 // Define missing response types
-interface PeopleResponse {
+/**
+ * Response containing information about people
+ */
+export interface PeopleResponse {
+  /** Array of people information */
   people: Array<{
+    /** Unique identifier for the person */
     id: string;
+    /** Full name of the person */
     name: string;
+    /** Email address of the person */
     email: string;
+    /** Additional details about the person */
     details?: Record<string, unknown>;
   }>;
 }
 
-interface FeatureFlagsResponse {
+/**
+ * Response containing feature flag settings
+ */
+export interface FeatureFlagsResponse {
+  /** Map of feature names to boolean values indicating if they're enabled */
   flags: Record<string, boolean>;
 }
 
-interface NotionIntegrationResponse {
+/**
+ * Response containing Notion integration details
+ */
+export interface NotionIntegrationResponse {
+  /** Whether the user has connected Notion */
   connected: boolean;
+  /** Available Notion workspaces */
   workspaces?: Array<{
+    /** Workspace ID */
     id: string;
+    /** Workspace name */
     name: string;
   }>;
 }
 
-interface SubscriptionsResponse {
+/**
+ * Response containing subscription information
+ */
+export interface SubscriptionsResponse {
+  /** Array of subscription details */
   subscriptions: Array<{
+    /** Unique identifier for the subscription */
     id: string;
+    /** Type of plan (e.g., "free", "pro", "team") */
     plan_type: string;
+    /** Current status of the subscription */
     status: string;
+    /** When the current billing period ends */
     current_period_end: string;
+    /** ID of the workspace this subscription applies to */
     workspace_id?: string;
+    /** When the subscription was canceled, if applicable */
     canceled_at?: string;
   }>;
 }
