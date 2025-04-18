@@ -1,4 +1,0 @@
-- use Bun and Typescript for this codebase
-- use Bun instead of node/npm when possible
-- prefer using Bun's native APIs instead of importing external dependencies when possible
-- make git commits after each of your major changes and especially make sure you make a git commit before doing large changes or changes to multiple files
