@@ -1,0 +1,473 @@
+openapi: 3.0.0
+info:
+  title: Granola API
+  description: Unofficial API documentation for Granola based on network traffic analysis
+  version: '1.0'
+  
+servers:
+  - url: https://api.granola.ai
+    description: Granola API Server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    Workspace:
+      type: object
+      properties:
+        workspace_id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        display_name:
+          type: string
+        is_locked:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        privacy_mode_enabled:
+          type: boolean
+        sharing_link_visibility:
+          type: string
+          nullable: true
+    
+    WorkspaceResponse:
+      type: object
+      properties:
+        workspaces:
+          type: array
+          items:
+            type: object
+            properties:
+              workspace:
+                $ref: '#/components/schemas/Workspace'
+              role:
+                type: string
+              plan_type:
+                type: string
+    
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        notes:
+          type: object
+          properties:
+            type:
+              type: string
+            content:
+              type: array
+              items:
+                type: object
+        title:
+          type: string
+        user_id:
+          type: string
+        cloned_from:
+          type: string
+          nullable: true
+        notes_plain:
+          type: string
+        transcribe:
+          type: boolean
+        google_calendar_event:
+          type: object
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        overview:
+          type: string
+          nullable: true
+        public:
+          type: boolean
+        people:
+          type: object
+          properties:
+            creator:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                details:
+                  type: object
+            attendees:
+              type: array
+              items:
+                type: object
+        chapters:
+          type: array
+          nullable: true
+        meeting_end_count:
+          type: integer
+        notes_markdown:
+          type: string
+        selected_template:
+          type: string
+          nullable: true
+        valid_meeting:
+          type: boolean
+        summary:
+          type: string
+          nullable: true
+        has_shareable_link:
+          type: boolean
+        show_private_notes:
+          type: boolean
+        attachments:
+          type: array
+          items:
+            type: object
+        privacy_mode_enabled:
+          type: boolean
+        sharing_link_visibility:
+          type: string
+    
+    DocumentsResponse:
+      type: object
+      properties:
+        docs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+    
+    DocumentMetadata:
+      type: object
+      properties:
+        creator:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            details:
+              type: object
+              properties:
+                person:
+                  type: object
+                  properties:
+                    name:
+                      type: object
+                      properties:
+                        fullName:
+                          type: string
+                    avatar:
+                      type: string
+                    employment:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        name:
+                          type: string
+                company:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+        attendees:
+          type: array
+          items:
+            type: object
+    
+    TranscriptSegment:
+      type: object
+      properties:
+        document_id:
+          type: string
+        start_timestamp:
+          type: string
+          format: date-time
+        text:
+          type: string
+        source:
+          type: string
+        id:
+          type: string
+        is_final:
+          type: boolean
+        end_timestamp:
+          type: string
+          format: date-time
+    
+    PanelTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        is_granola:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        owner_id:
+          type: string
+          nullable: true
+        category:
+          type: string
+        title:
+          type: string
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              heading:
+                type: string
+              section_description:
+                type: string
+        color:
+          type: string
+        symbol:
+          type: string
+        description:
+          type: string
+        shared_with:
+          type: string
+        copied_from:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+        user_types:
+          type: array
+          items:
+            type: object
+            properties:
+              user_type:
+                type: string
+
+paths:
+  /v1/get-workspaces:
+    post:
+      summary: Get workspaces
+      description: Retrieves the list of workspaces for the authenticated user
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceResponse'
+  
+  /v2/get-documents:
+    post:
+      summary: Get documents
+      description: Retrieves the list of documents for the authenticated user
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentsResponse'
+  
+  /v1/get-document-metadata:
+    post:
+      summary: Get document metadata
+      description: Retrieves metadata for a specific document
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - document_id
+              properties:
+                document_id:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentMetadata'
+  
+  /v1/get-document-transcript:
+    post:
+      summary: Get document transcript
+      description: Retrieves the transcript for a specific document
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - document_id
+              properties:
+                document_id:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TranscriptSegment'
+  
+  /v1/update-document:
+    post:
+      summary: Update document
+      description: Updates a document
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response
+  
+  /v1/update-document-panel:
+    post:
+      summary: Update document panel
+      description: Updates a document panel
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response
+  
+  /v1/get-panel-templates:
+    post:
+      summary: Get panel templates
+      description: Retrieves available panel templates
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PanelTemplate'
+  
+  /v1/get-people:
+    post:
+      summary: Get people
+      description: Retrieves people data
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  
+  /v1/get-feature-flags:
+    post:
+      summary: Get feature flags
+      description: Retrieves feature flags for the authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  
+  /v1/get-notion-integration:
+    post:
+      summary: Get Notion integration
+      description: Retrieves Notion integration details
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  
+  /v1/get-subscriptions:
+    post:
+      summary: Get subscriptions
+      description: Retrieves subscription information for the authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  
+  /v1/refresh-google-events:
+    post:
+      summary: Refresh Google events
+      description: Refreshes Google Calendar events
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful response
+  
+  /v1/check-for-update/latest-mac.yml:
+    get:
+      summary: Check for update
+      description: Checks for application updates
+      responses:
+        '200':
+          description: Successful response
