@@ -1,5 +1,6 @@
 // src/client.ts
-import { Http, HttpOpts } from './http';
+import { Http } from './http';
+import type { HttpOpts } from './http';
 import { paginate } from './pagination';
 import type { components } from './schema';
 
@@ -127,9 +128,14 @@ export class GranolaClient {
   } = {}): AsyncGenerator<Document, void, unknown> {
     yield* paginate(async (cursor?: string) => {
       const response = await this.getDocuments({ ...filters, cursor });
+      // Handle next_cursor which may be present in the response
+      const nextCursor = 'next_cursor' in response ? 
+        (response as unknown as { next_cursor?: string }).next_cursor : 
+        undefined;
+      
       return { 
         items: response.docs ?? [], 
-        next: response.next_cursor as string | undefined 
+        next: nextCursor
       };
     });
   }
