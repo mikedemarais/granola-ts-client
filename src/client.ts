@@ -1,0 +1,305 @@
+// src/client.ts
+import { Http, HttpOpts } from './http';
+import { paginate } from './pagination';
+import type { components } from './schema';
+
+// Aliases for response schemas
+type WorkspaceResponse = components['schemas']['WorkspaceResponse'];
+type DocumentsResponse = components['schemas']['DocumentsResponse'];
+type DocumentMetadata = components['schemas']['DocumentMetadata'];
+type TranscriptSegment = components['schemas']['TranscriptSegment'];
+type PanelTemplate = components['schemas']['PanelTemplate'];
+type Document = components['schemas']['Document'];
+
+// Define missing response types
+interface PeopleResponse {
+  people: Array<{
+    id: string;
+    name: string;
+    email: string;
+    details?: Record<string, unknown>;
+  }>;
+}
+
+interface FeatureFlagsResponse {
+  flags: Record<string, boolean>;
+}
+
+interface NotionIntegrationResponse {
+  connected: boolean;
+  workspaces?: Array<{
+    id: string;
+    name: string;
+  }>;
+}
+
+interface SubscriptionsResponse {
+  subscriptions: Array<{
+    id: string;
+    plan_type: string;
+    status: string;
+    current_period_end: string;
+    workspace_id?: string;
+    canceled_at?: string;
+  }>;
+}
+
+/**
+ * Client configuration options.
+ */
+export interface ClientOpts extends HttpOpts {
+  /** Base URL for the Granola API */
+  baseUrl?: string;
+}
+
+/**
+ * Granola API client.
+ */
+export class GranolaClient {
+  private http: Http;
+
+  /**
+   * Create a new GranolaClient.
+   * @param token API authentication token (defaults to env GRANOLA_TOKEN)
+   * @param opts HTTP and client options
+   */
+  constructor(token = process.env.GRANOLA_TOKEN!, opts: ClientOpts = {}) {
+    this.http = new Http(token, opts.baseUrl, opts);
+  }
+
+  /**
+   * Retrieve all workspaces for the user.
+   * @returns List of workspaces the user has access to
+   * @example
+   * ```ts
+   * const workspaces = await client.getWorkspaces();
+   * console.log(`You have ${workspaces.workspaces.length} workspaces`);
+   * ```
+   */
+  public getWorkspaces(): Promise<WorkspaceResponse> {
+    return this.http.post<WorkspaceResponse>('/v1/get-workspaces', {});
+  }
+
+  /**
+   * Fetch a single page of documents.
+   * @param filters Optional query filters
+   * @param filters.workspace_id Optional workspace ID to filter by
+   * @param filters.cursor Optional pagination cursor
+   * @param filters.limit Optional limit of documents to return
+   * @returns A page of documents
+   * @example
+   * ```ts
+   * // Get first page of documents
+   * const docs = await client.getDocuments({ limit: 20 });
+   * 
+   * // Get documents from a specific workspace
+   * const workspaceDocs = await client.getDocuments({ 
+   *   workspace_id: 'abc-123',
+   *   limit: 50
+   * });
+   * ```
+   */
+  public getDocuments(filters: {
+    workspace_id?: string;
+    cursor?: string;
+    limit?: number;
+    [key: string]: unknown;
+  } = {}): Promise<DocumentsResponse> {
+    return this.http.post<DocumentsResponse>('/v2/get-documents', filters);
+  }
+
+  /**
+   * Async iterator to paginate through all documents.
+   * @param filters Optional query filters (same as getDocuments)
+   * @returns AsyncGenerator that yields documents one by one
+   * @example
+   * ```ts
+   * // Iterate through all documents in a workspace
+   * for await (const doc of client.listAllDocuments({ workspace_id: 'abc-123' })) {
+   *   console.log(`Document: ${doc.title}`);
+   * }
+   * ```
+   */
+  public async *listAllDocuments(filters: {
+    workspace_id?: string;
+    limit?: number;
+    [key: string]: unknown;
+  } = {}): AsyncGenerator<Document, void, unknown> {
+    yield* paginate(async (cursor?: string) => {
+      const response = await this.getDocuments({ ...filters, cursor });
+      return { 
+        items: response.docs ?? [], 
+        next: response.next_cursor as string | undefined 
+      };
+    });
+  }
+
+  /**
+   * Retrieve metadata for a document.
+   * @param documentId ID of the document
+   * @returns Document metadata including creator and attendees
+   * @example
+   * ```ts
+   * const metadata = await client.getDocumentMetadata('doc-123');
+   * console.log(`Created by: ${metadata.creator.name}`);
+   * ```
+   */
+  public getDocumentMetadata(documentId: string): Promise<DocumentMetadata> {
+    return this.http.post<DocumentMetadata>('/v1/get-document-metadata', { document_id: documentId });
+  }
+
+  /**
+   * Retrieve transcript segments for a document.
+   * @param documentId ID of the document
+   * @returns Array of transcript segments with timestamps
+   * @example
+   * ```ts
+   * const transcript = await client.getDocumentTranscript('doc-123');
+   * for (const segment of transcript) {
+   *   console.log(`${segment.start_timestamp}: ${segment.text}`);
+   * }
+   * ```
+   */
+  public getDocumentTranscript(documentId: string): Promise<TranscriptSegment[]> {
+    return this.http.post<TranscriptSegment[]>('/v1/get-document-transcript', { document_id: documentId });
+  }
+
+  /**
+   * Update a document.
+   * @param payload Document fields to update
+   * @param payload.document_id ID of the document to update
+   * @param payload.title Optional new title for the document
+   * @param payload.notes Optional new notes content
+   * @param payload.overview Optional new overview content
+   * @param payload.notes_plain Optional new plain text notes
+   * @param payload.notes_markdown Optional new markdown formatted notes
+   * @returns Promise that resolves when the update is complete
+   */
+  public updateDocument(payload: {
+    document_id: string;
+    title?: string;
+    notes?: Record<string, unknown>;
+    overview?: string;
+    notes_plain?: string;
+    notes_markdown?: string;
+    [key: string]: unknown;
+  }): Promise<void> {
+    return this.http.post<void>('/v1/update-document', payload);
+  }
+
+  /**
+   * Update a document panel.
+   * @param payload Panel data to update
+   * @param payload.document_id ID of the document the panel belongs to
+   * @param payload.panel_id ID of the panel to update
+   * @param payload.content Content to update in the panel
+   * @returns Promise that resolves when the update is complete
+   */
+  public updateDocumentPanel(payload: {
+    document_id: string;
+    panel_id: string;
+    content: Record<string, unknown>;
+    [key: string]: unknown;
+  }): Promise<void> {
+    return this.http.post<void>('/v1/update-document-panel', payload);
+  }
+
+  /**
+   * Retrieve available panel templates.
+   * @returns Array of panel templates that can be used with documents
+   * @example
+   * ```ts
+   * const templates = await client.getPanelTemplates();
+   * console.log(`Available templates: ${templates.map(t => t.title).join(', ')}`);
+   * ```
+   */
+  public getPanelTemplates(): Promise<PanelTemplate[]> {
+    return this.http.post<PanelTemplate[]>('/v1/get-panel-templates', {});
+  }
+
+  /**
+   * Retrieve people data.
+   * @returns Information about people in the user's network
+   * @example
+   * ```ts
+   * const peopleData = await client.getPeople();
+   * console.log(`Found ${peopleData.people.length} people`);
+   * ```
+   */
+  public getPeople(): Promise<PeopleResponse> {
+    return this.http.post<PeopleResponse>('/v1/get-people');
+  }
+
+  /**
+   * Retrieve feature flags for the user.
+   * @returns Object containing feature flag values
+   * @example
+   * ```ts
+   * const featureFlags = await client.getFeatureFlags();
+   * if (featureFlags.flags.newFeature) {
+   *   // Use new feature
+   * }
+   * ```
+   */
+  public getFeatureFlags(): Promise<FeatureFlagsResponse> {
+    return this.http.post<FeatureFlagsResponse>('/v1/get-feature-flags');
+  }
+
+  /**
+   * Retrieve Notion integration details.
+   * @returns Information about the user's Notion integration
+   * @example
+   * ```ts
+   * const notionIntegration = await client.getNotionIntegration();
+   * if (notionIntegration.connected) {
+   *   console.log('Notion is connected');
+   * }
+   * ```
+   */
+  public getNotionIntegration(): Promise<NotionIntegrationResponse> {
+    return this.http.post<NotionIntegrationResponse>('/v1/get-notion-integration');
+  }
+
+  /**
+   * Retrieve subscription information for the user.
+   * @returns Details about the user's subscription plans
+   * @example
+   * ```ts
+   * const subscriptions = await client.getSubscriptions();
+   * for (const sub of subscriptions.subscriptions) {
+   *   console.log(`Plan: ${sub.plan_type}, Status: ${sub.status}`);
+   * }
+   * ```
+   */
+  public getSubscriptions(): Promise<SubscriptionsResponse> {
+    return this.http.post<SubscriptionsResponse>('/v1/get-subscriptions');
+  }
+
+  /**
+   * Refresh Google Calendar events.
+   * @returns Promise that resolves when the refresh is complete
+   * @example
+   * ```ts
+   * await client.refreshGoogleEvents();
+   * console.log('Google events refreshed');
+   * ```
+   */
+  public refreshGoogleEvents(): Promise<void> {
+    return this.http.post<void>('/v1/refresh-google-events');
+  }
+
+  /**
+   * Check for application updates (YAML manifest).
+   * @returns YAML string containing update information
+   * @example
+   * ```ts
+   * const updateInfo = await client.checkForUpdate();
+   * console.log('Update info:', updateInfo);
+   * ```
+   */
+  public checkForUpdate(): Promise<string> {
+    return this.http.getText('/v1/check-for-update/latest-mac.yml');
+  }
+}
+
+export default GranolaClient;
