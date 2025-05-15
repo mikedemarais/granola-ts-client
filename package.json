@@ -1,13 +1,16 @@
 {
   "name": "granola-ts-client",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "TypeScript client for the Granola API",
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
       "default": "./dist/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
