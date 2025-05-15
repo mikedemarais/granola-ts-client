@@ -1,0 +1,33 @@
+# Source files
+/src
+
+# Test files
+/tests
+*.test.ts
+
+# Config files
+tsconfig.json
+tsconfig.build.json
+.github
+.gitignore
+
+# Docs source
+docs-src
+
+# Examples
+examples
+
+# Export script and data
+export-meetings.ts
+/exports
+
+# Development files
+.DS_Store
+.vscode
+.idea
+*.log
+coverage
+node_modules
+
+# OpenAPI spec
+openapi.yaml
