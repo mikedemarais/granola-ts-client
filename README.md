@@ -34,6 +34,8 @@ Alternatively, add `GRANOLA_TOKEN=<your_token>` to a `.env` file in your project
 
 ## Usage
 
+### Using the Client
+
 ```ts
 import GranolaClient from 'granola-ts-client';
 
@@ -57,6 +59,33 @@ const docs = await client.getDocuments({
 for await (const doc of client.listAllDocuments({ workspace_id: 'your-workspace-id' })) {
   console.log(`Document: ${doc.title}`);
 }
+```
+
+### Using Types
+
+The package exports all types, so you can use them in your TypeScript code:
+
+```ts
+import GranolaClient, { 
+  PeopleResponse, 
+  FeatureFlagsResponse,
+  NotionIntegrationResponse,
+  components
+} from 'granola-ts-client';
+
+// Use types in your code
+const people: PeopleResponse = await client.getPeople();
+
+// Use generated schema types
+type Document = components['schemas']['Document'];
+type WorkspaceResponse = components['schemas']['WorkspaceResponse'];
+
+// Work with typed data
+const document: Document = {
+  id: 'doc-123',
+  title: 'Meeting Notes',
+  // ...
+};
 ```
 
 ## Features
