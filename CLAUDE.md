@@ -26,6 +26,14 @@
 - Maintain 80%+ test coverage for all new code
 - Use async/await syntax rather than Promises with then/catch
 
+### TypeScript and Type Exports
+
+- All public-facing types must be explicitly exported from the package
+- Update `src/index.ts` when adding new interfaces or types that should be available to package consumers
+- Document exported types with JSDoc comments
+- Ensure all exported types follow the naming conventions established in the codebase
+- Run `bun build` and verify type exports are correctly generated in the `dist` folder after making type-related changes
+
 ### Git Workflow
 
 - Make atomic git commits that represent single logical changes
