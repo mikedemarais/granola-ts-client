@@ -90,10 +90,13 @@ export class GranolaClient {
 
   /**
    * Create a new GranolaClient.
-   * @param token API authentication token (defaults to env GRANOLA_TOKEN)
+   * @param token API authentication token (required)
    * @param opts HTTP and client options
    */
-  constructor(token = process.env.GRANOLA_TOKEN!, opts: ClientOpts = {}) {
+  constructor(token: string, opts: ClientOpts = {}) {
+    if (!token) {
+      throw new Error('GranolaClient requires an API token. Please provide your GRANOLA_TOKEN when instantiating the client.');
+    }
     this.http = new Http(token, opts.baseUrl, opts);
   }
 

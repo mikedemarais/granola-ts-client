@@ -25,12 +25,7 @@ This client requires a Granola API access token. You can retrieve your token by 
 jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/Library/Application Support/Granola/supabase.json"
 ```
 
-Then export it as an environment variable:
-```bash
-export GRANOLA_TOKEN=$(jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/Library/Application Support/Granola/supabase.json")
-```
-
-Alternatively, add `GRANOLA_TOKEN=<your_token>` to a `.env` file in your project root.
+You must provide this token explicitly when instantiating the client (see Usage section below).
 
 ## Usage
 
@@ -39,11 +34,8 @@ Alternatively, add `GRANOLA_TOKEN=<your_token>` to a `.env` file in your project
 ```ts
 import GranolaClient from 'granola-ts-client';
 
-// Initialize client with token from environment variable
-const client = new GranolaClient();
-
-// Or provide token explicitly
-// const client = new GranolaClient('your-api-token');
+// Initialize client with your API token (required)
+const client = new GranolaClient('your-api-token');
 
 // Get workspaces
 const workspaces = await client.getWorkspaces();

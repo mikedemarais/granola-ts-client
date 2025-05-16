@@ -1,6 +1,6 @@
 {
   "name": "granola-ts-client",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "TypeScript client for the Granola API",
   "type": "module",
   "exports": {
