@@ -1,6 +1,6 @@
 {
   "name": "granola-ts-client",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "TypeScript client for the Granola API with automatic client validation bypass",
   "type": "module",
   "exports": {
@@ -52,7 +52,11 @@
     "meetings",
     "notes",
     "official-client",
-    "compatibility"
+    "compatibility",
+    "cross-platform",
+    "windows",
+    "macos",
+    "linux"
   ],
   "author": "Mike Demarais",
   "license": "MIT",
