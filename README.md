@@ -43,19 +43,19 @@ const docs = await client.getDocuments({
 const client = new GranolaClient('your-api-token');
 ```
 
-### Option 2: Extract from Local Granola App
+### Option 2: Extract from Local Granola App (macOS only)
 
-The client provides a helper method to extract authentication tokens from a local Granola desktop installation:
+The client provides a helper method to extract authentication tokens from a local Granola desktop installation on macOS:
 
 ```ts
-// Extract tokens (Node.js environment only)
+// Extract tokens from macOS Granola app (Node.js environment only)
 const { accessToken } = await GranolaClient.getAuthTokens();
 
 // Create client with the extracted token
 const client = new GranolaClient(accessToken);
 ```
 
-You can also extract the token manually:
+You can also extract the token manually on macOS:
 
 ```bash
 jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/Library/Application Support/Granola/supabase.json"

@@ -19,25 +19,14 @@ describe('Token extraction', () => {
   });
   
   // Test that we can't really run but can validate the paths
-  it('should use correct platform-specific paths', () => {
-    // Just verify the path logic without trying to mock homedir
+  it('should use correct macOS path', () => {
+    // Just verify the path logic 
     const homedir = os.homedir();
-    const platform = os.platform();
-    
-    // Test the path resolution logic
-    let expectedPath: string;
-    if (platform === 'darwin') {
-      expectedPath = path.join(homedir, 'Library/Application Support/Granola/supabase.json');
-    } else if (platform === 'win32') {
-      expectedPath = path.join(homedir, 'AppData/Roaming/Granola/supabase.json');
-    } else if (platform === 'linux') {
-      expectedPath = path.join(homedir, '.config/Granola/supabase.json');
-    } else {
-      expectedPath = path.join(homedir, 'Library/Application Support/Granola/supabase.json');
-    }
+    const expectedPath = path.join(homedir, 'Library/Application Support/Granola/supabase.json');
     
     expect(expectedPath).toBeDefined();
     expect(typeof expectedPath).toBe('string');
     expect(expectedPath.includes(homedir)).toBe(true);
+    expect(expectedPath.includes('Library/Application Support/Granola')).toBe(true);
   });
 });

@@ -112,12 +112,10 @@ export class GranolaClient {
    * the "Unsupported client" validation by using the same tokens as the official app.
    * 
    * Note: This requires:
-   * - Running in a Node.js environment
-   * - Having the Granola desktop app installed and logged in
-   * - Access to the Granola tokens file in its default location for your platform:
-   *   - macOS: ~/Library/Application Support/Granola/supabase.json
-   *   - Windows: ~/AppData/Roaming/Granola/supabase.json
-   *   - Linux: ~/.config/Granola/supabase.json
+   * - Running in a Node.js environment 
+   * - Having the Granola desktop app installed and logged in on macOS
+   * - Access to the Granola tokens file at ~/Library/Application Support/Granola/supabase.json
+   * - Only macOS is supported
    * 
    * @returns Object containing access and refresh tokens from the official Granola app
    * @throws Error if tokens cannot be read or parsed
@@ -145,49 +143,14 @@ export class GranolaClient {
       const path = await import('path');
       const os = await import('os');
       
-      // Path to Granola app support directory based on platform
+      // Path to Granola app support directory (macOS only)
       const homedir = os.homedir();
-      const platform = os.platform();
-      
-      let granolaDir;
-      // Determine path based on platform
-      switch(platform) {
-        case 'darwin': // macOS
-          granolaDir = path.join(homedir, 'Library/Application Support/Granola');
-          break;
-        case 'win32': // Windows
-          granolaDir = path.join(homedir, 'AppData/Roaming/Granola');
-          break;
-        case 'linux': // Linux
-          granolaDir = path.join(homedir, '.config/Granola');
-          break;
-        default:
-          // Default to macOS path, but warn in the console
-          granolaDir = path.join(homedir, 'Library/Application Support/Granola');
-          console.warn(`Unknown platform ${platform}. Using default macOS path for token lookup.`);
-      }
-      
+      const granolaDir = path.join(homedir, 'Library/Application Support/Granola');
       const supabaseFilePath = path.join(granolaDir, 'supabase.json');
       
       // Check if the file exists
       if (!fs.existsSync(supabaseFilePath)) {
-        // Create platform-specific expected path description
-        let expectedPathFormat;
-        switch(platform) {
-          case 'darwin':
-            expectedPathFormat = '~/Library/Application Support/Granola/supabase.json';
-            break;
-          case 'win32':
-            expectedPathFormat = '~/AppData/Roaming/Granola/supabase.json';
-            break;
-          case 'linux':
-            expectedPathFormat = '~/.config/Granola/supabase.json';
-            break;
-          default:
-            expectedPathFormat = '[user home directory]/Granola/supabase.json';
-        }
-        
-        throw new Error(`Granola token file not found at ${supabaseFilePath}. Make sure Granola desktop app is installed and you're logged in. The expected path for your platform (${platform}) is: ${expectedPathFormat}`);
+        throw new Error(`Granola token file not found at ${supabaseFilePath}. Make sure Granola desktop app is installed and you're logged in. The expected path is: ~/Library/Application Support/Granola/supabase.json`);
       }
       
       // Read and parse the tokens
