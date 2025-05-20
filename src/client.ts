@@ -147,8 +147,18 @@ export class GranolaClient {
       const appSupportDir = path.join(homedir, 'Library/Application Support/Granola');
       const supabaseFilePath = path.join(appSupportDir, 'supabase.json');
       
+      // Check if the file exists
+      if (!fs.existsSync(supabaseFilePath)) {
+        throw new Error(`Granola token file not found at ${supabaseFilePath}. Make sure Granola desktop app is installed and you're logged in.`);
+      }
+      
       // Read and parse the tokens
       const supabaseData = JSON.parse(fs.readFileSync(supabaseFilePath, 'utf8'));
+      
+      if (!supabaseData.cognito_tokens) {
+        throw new Error(`No cognito_tokens found in ${supabaseFilePath}`);
+      }
+      
       const cognitoTokens = JSON.parse(supabaseData.cognito_tokens);
       
       return {
@@ -156,6 +166,7 @@ export class GranolaClient {
         refreshToken: cognitoTokens.refresh_token
       };
     } catch (error) {
+      console.error('Error extracting Granola authentication tokens:', error);
       throw new Error(`Failed to extract authentication tokens: ${(error as Error).message}`);
     }
   }
