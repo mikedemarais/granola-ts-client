@@ -174,11 +174,14 @@ export class GranolaClient {
 
   /**
    * Create a new GranolaClient.
-   * @param token API authentication token (required)
+   * @param token API authentication token (optional - will be automatically retrieved if not provided)
    * @param opts HTTP and client options
    * @example
    * ```ts
-   * // Basic client (automatically mimics the official Granola client)
+   * // Auto-retrieval of token from local Granola installation
+   * const client = new GranolaClient();
+   * 
+   * // Basic client with explicitly provided token
    * const client = new GranolaClient("your_token");
    * 
    * // Client with custom client identification
@@ -190,11 +193,16 @@ export class GranolaClient {
    * });
    * ```
    */
-  constructor(token: string, opts: ClientOpts = {}) {
-    if (!token) {
-      throw new Error('GranolaClient requires an API token. Please provide your GRANOLA_TOKEN when instantiating the client.');
-    }
+  constructor(token?: string, opts: ClientOpts = {}) {
     this.http = new Http(token, opts.baseUrl, opts);
+    
+    // If no token is provided, we'll lazily fetch it when needed
+    if (!token) {
+      this.http.setTokenProvider(async () => {
+        const { accessToken } = await GranolaClient.getAuthTokens();
+        return accessToken;
+      });
+    }
   }
 
   /**
