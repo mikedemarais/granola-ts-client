@@ -28,8 +28,7 @@
     "test": "bun test",
     "format": "biome format . --write",
     "lint": "biome check .",
-    "docs": "typedoc --entryPoints src/index.ts --out docs",
-    "ci": "bun run lint && bun run test && bun run build && bun run docs",
+    "ci": "bun run lint && bun run test && bun run build",
     "prepublishOnly": "bun run ci"
   },
   "dependencies": {},
