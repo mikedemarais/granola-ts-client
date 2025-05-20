@@ -1,6 +1,6 @@
 {
   "name": "granola-ts-client",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "TypeScript client for the Granola API with automatic client validation bypass",
   "type": "module",
   "exports": {
