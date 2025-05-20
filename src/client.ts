@@ -80,6 +80,24 @@ export interface SubscriptionsResponse {
 export interface ClientOpts extends HttpOpts {
   /** Base URL for the Granola API */
   baseUrl?: string;
+  /** App version for client identification (default: 6.4.0) */
+  appVersion?: string;
+  /** Client type for identification (default: electron) */
+  clientType?: string;
+  /** Platform for client identification (default: darwin) */
+  clientPlatform?: string;
+  /** Architecture for client identification (default: arm64) */
+  clientArchitecture?: string;
+  /** Electron version for user agent (default: 33.4.5) */
+  electronVersion?: string;
+  /** Chrome version for user agent (default: 130.0.6723.191) */
+  chromeVersion?: string;
+  /** Node version for user agent (default: 20.18.3) */
+  nodeVersion?: string;
+  /** OS version for user agent (default: 15.3.1) */
+  osVersion?: string;
+  /** OS build for user agent (default: 24D70) */
+  osBuild?: string;
 }
 
 /**
@@ -89,9 +107,76 @@ export class GranolaClient {
   private http: Http;
 
   /**
+   * Extract authentication tokens from a local Granola app installation.
+   * This can be used to obtain tokens for authenticating with the API and bypassing
+   * the "Unsupported client" validation by using the same tokens as the official app.
+   * 
+   * Note: This requires:
+   * - Running in a Node.js environment
+   * - Having the Granola desktop app installed and logged in
+   * - Access to ~/Library/Application Support/Granola directory
+   * 
+   * @returns Object containing access and refresh tokens from the official Granola app
+   * @throws Error if tokens cannot be read or parsed
+   * @example
+   * ```ts
+   * // Get tokens from the local Granola app
+   * const { accessToken } = await GranolaClient.getAuthTokens();
+   * 
+   * // Create a client with the extracted token
+   * const client = new GranolaClient(accessToken);
+   * 
+   * // API calls will work without "Unsupported client" errors
+   * const workspaces = await client.getWorkspaces();
+   * ```
+   */
+  public static async getAuthTokens(): Promise<{ accessToken: string; refreshToken: string }> {
+    try {
+      // This requires running in a Node.js environment
+      if (typeof process === 'undefined' || typeof require !== 'function') {
+        throw new Error('getAuthTokens can only be used in a Node.js environment');
+      }
+      
+      // Dynamically import required modules
+      const fs = await import('fs');
+      const path = await import('path');
+      const os = await import('os');
+      
+      // Path to Granola app support directory
+      const homedir = os.homedir();
+      const appSupportDir = path.join(homedir, 'Library/Application Support/Granola');
+      const supabaseFilePath = path.join(appSupportDir, 'supabase.json');
+      
+      // Read and parse the tokens
+      const supabaseData = JSON.parse(fs.readFileSync(supabaseFilePath, 'utf8'));
+      const cognitoTokens = JSON.parse(supabaseData.cognito_tokens);
+      
+      return {
+        accessToken: cognitoTokens.access_token,
+        refreshToken: cognitoTokens.refresh_token
+      };
+    } catch (error) {
+      throw new Error(`Failed to extract authentication tokens: ${(error as Error).message}`);
+    }
+  }
+
+  /**
    * Create a new GranolaClient.
    * @param token API authentication token (required)
    * @param opts HTTP and client options
+   * @example
+   * ```ts
+   * // Basic client (automatically mimics the official Granola client)
+   * const client = new GranolaClient("your_token");
+   * 
+   * // Client with custom client identification
+   * const client = new GranolaClient("your_token", {
+   *   appVersion: "6.5.0",
+   *   clientType: "electron", 
+   *   clientPlatform: "darwin",
+   *   clientArchitecture: "arm64"
+   * });
+   * ```
    */
   constructor(token: string, opts: ClientOpts = {}) {
     if (!token) {

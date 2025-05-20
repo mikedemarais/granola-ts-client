@@ -4,6 +4,26 @@ export interface HttpOpts {
   timeout?: number;
   /** Number of retry attempts for failed requests */
   retries?: number;
+  /** App version for client identification (default: 6.4.0) */
+  appVersion?: string;
+  /** Client type for identification (default: electron) */
+  clientType?: string;
+  /** Platform for client identification (default: darwin) */
+  clientPlatform?: string;
+  /** Architecture for client identification (default: arm64) */
+  clientArchitecture?: string;
+  /** Electron version for user agent (default: 33.4.5) */
+  electronVersion?: string;
+  /** Chrome version for user agent (default: 130.0.6723.191) */
+  chromeVersion?: string;
+  /** Node version for user agent (default: 20.18.3) */
+  nodeVersion?: string;
+  /** OS version for user agent (default: 15.3.1) */
+  osVersion?: string;
+  /** OS build for user agent (default: 24D70) */
+  osBuild?: string;
+  /** Additional client headers to include in requests */
+  clientHeaders?: Record<string, string>;
 }
 
 /**
@@ -14,6 +34,16 @@ export class Http {
   private baseUrl: string;
   private timeout: number;
   private retries: number;
+  private appVersion: string;
+  private clientType: string;
+  private clientPlatform: string;
+  private clientArchitecture: string;
+  private electronVersion: string;
+  private chromeVersion: string;
+  private nodeVersion: string;
+  private osVersion: string;
+  private osBuild: string;
+  private clientHeaders: Record<string, string>;
 
   constructor(token: string, baseUrl = 'https://api.granola.ai', opts: HttpOpts = {}) {
     if (!token) throw new Error('Granola token must be provided');
@@ -21,6 +51,16 @@ export class Http {
     this.baseUrl = baseUrl.replace(/\/+$/g, '');
     this.timeout = opts.timeout ?? 5000;
     this.retries = opts.retries ?? 3;
+    this.appVersion = opts.appVersion ?? '6.4.0';
+    this.clientType = opts.clientType ?? 'electron';
+    this.clientPlatform = opts.clientPlatform ?? 'darwin';
+    this.clientArchitecture = opts.clientArchitecture ?? 'arm64';
+    this.electronVersion = opts.electronVersion ?? '33.4.5';
+    this.chromeVersion = opts.chromeVersion ?? '130.0.6723.191';
+    this.nodeVersion = opts.nodeVersion ?? '20.18.3';
+    this.osVersion = opts.osVersion ?? '15.3.1';
+    this.osBuild = opts.osBuild ?? '24D70';
+    this.clientHeaders = opts.clientHeaders ?? {};
   }
 
   private async delay(ms: number): Promise<void> {
@@ -45,7 +85,20 @@ export class Http {
         const headers: Record<string, string> = {
           Authorization: `Bearer ${this.token}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         };
+        
+        // Add client identification headers (always enabled)
+        // Standard client headers
+        headers['X-App-Version'] = this.appVersion;
+        headers['User-Agent'] = `Granola/${this.appVersion} Electron/${this.electronVersion} Chrome/${this.chromeVersion} Node/${this.nodeVersion} (macOS ${this.osVersion} ${this.osBuild})`;
+        headers['X-Client-Type'] = this.clientType;
+        headers['X-Client-Platform'] = this.clientPlatform;
+        headers['X-Client-Architecture'] = this.clientArchitecture;
+        headers['X-Client-Id'] = `granola-${this.clientType}-${this.appVersion}`;
+        
+        // Add any additional client headers
+        Object.assign(headers, this.clientHeaders);
         const init: RequestInit = { method, headers, signal: controller.signal };
         if (body !== undefined) init.body = JSON.stringify(body);
         const res = await fetch(url, init);
@@ -115,7 +168,20 @@ export class Http {
    */
   public async getText(path: string): Promise<string> {
     const url = new URL(path, this.baseUrl).toString();
-    const headers = { Authorization: `Bearer ${this.token}` };
+    const headers: Record<string, string> = { Authorization: `Bearer ${this.token}` };
+    
+    // Add client identification headers (always enabled)
+    // Standard client headers
+    headers['X-App-Version'] = this.appVersion;
+    headers['User-Agent'] = `Granola/${this.appVersion} Electron/${this.electronVersion} Chrome/${this.chromeVersion} Node/${this.nodeVersion} (macOS ${this.osVersion} ${this.osBuild})`;
+    headers['X-Client-Type'] = this.clientType;
+    headers['X-Client-Platform'] = this.clientPlatform;
+    headers['X-Client-Architecture'] = this.clientArchitecture;
+    headers['X-Client-Id'] = `granola-${this.clientType}-${this.appVersion}`;
+    
+    // Add any additional client headers
+    Object.assign(headers, this.clientHeaders);
+    
     const res = await fetch(url, { method: 'GET', headers });
     if (!res.ok) {
       const text = await res.text();
