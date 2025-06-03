@@ -118,6 +118,58 @@ await client.updateDocumentPanel({
 });
 ```
 
+### Transcript Processing Features
+
+The client includes a `TranscriptClient` class that extends the base client with advanced transcript processing capabilities:
+
+```ts
+import { TranscriptClient } from 'granola-ts-client';
+
+// Initialize the transcript client (same constructor as GranolaClient)
+const client = new TranscriptClient();
+
+// Get a transcript with speaker identification
+const transcriptWithSpeakers = await client.getDocumentTranscriptWithSpeakers(
+  'document-id',
+  true,  // deduplicate segments (default: true)
+  0.68,  // similarity threshold (default: 0.68)
+  4.5    // time window seconds (default: 4.5)
+);
+
+// Export transcript with speaker formatting to markdown
+await client.exportTranscriptMarkdown(
+  'document-id',
+  'output.md',
+  {
+    deduplicate: true,  // deduplicate segments (default: true)
+    similarityThreshold: 0.68,  // similarity threshold (default: 0.68)
+    timeWindowSeconds: 4.5  // time window seconds (default: 4.5)
+  }
+);
+```
+
+The enhanced client provides these key features:
+
+1. **Speaker Identification**: Automatically identifies speakers based on audio source (microphone vs. system).
+2. **Transcript Deduplication**: Removes duplicate speech segments using text similarity detection.
+3. **Dialog Coherence**: Applies conversation patterns to improve speaker assignment.
+4. **Markdown Export**: Formats transcripts grouped by speaker instead of labeling each line.
+
+Example markdown output:
+
+```markdown
+Me:  
+Hello there, how are you today?  
+I've been working on the project all morning.  
+
+Them:  
+I'm doing well, thanks for asking.  
+How is the project coming along?  
+
+Me:  
+It's going great. I've made significant progress on the API integration.  
+```
+
 ### Other APIs
 
 ```ts
@@ -181,6 +233,10 @@ import GranolaClient, {
   ClientOpts,
   HttpOpts,
   
+  // Transcript processing types
+  TranscriptClient,
+  TranscriptSegmentWithSpeaker,
+  
   // Generated OpenAPI schema types
   components,
   paths
@@ -188,6 +244,11 @@ import GranolaClient, {
 
 // Use with type annotations
 const people: PeopleResponse = await client.getPeople();
+
+// Use transcript client types
+const transcriptClient = new TranscriptClient();
+const transcript: TranscriptSegmentWithSpeaker[] = 
+  await transcriptClient.getDocumentTranscriptWithSpeakers('doc-id');
 
 // Use generated schema types
 type Document = components['schemas']['Document'];
