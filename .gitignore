@@ -61,3 +61,7 @@ temp/
 
 # Project specific
 exports/
+**/.claude/settings.local.json
+n8n-processing-plan.md
+organization-config.json
+organization-config.*.json
