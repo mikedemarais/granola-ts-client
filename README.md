@@ -1,220 +1,146 @@
-# granola-ts-client
+# Granola TypeScript Client
 
-A TypeScript client for the Granola API. This client allows you to interact with Granola's note-taking and meeting management platform programmatically while automatically mimicking the official Granola desktop application to bypass "Unsupported client" validation.
+A TypeScript client for the Granola API with enhanced features.
+
+## Features
+
+- **Basic API Client:** Full TypeScript client for the Granola API
+- **Automatic Authentication:** Extracts tokens from the local Granola app installation
+- **Enhanced Transcripts:** Speaker identification, deduplication, and improved formatting
+- **Document Panels:** Access and extract structured content from meeting summaries
+- **Organization Detection:** Determine which organization a meeting belongs to
 
 ## Installation
 
 ```bash
-# using npm
 npm install granola-ts-client
-
-# using yarn
+# or
 yarn add granola-ts-client
-
-# using bun
+# or
 bun add granola-ts-client
 ```
 
-## Quick Start
+## Basic Usage
 
-```ts
-import GranolaClient from 'granola-ts-client';
+```typescript
+import { GranolaClient } from 'granola-ts-client';
 
-// Initialize with automatic token retrieval (macOS only)
+// Initialize with automatic token retrieval from local Granola app
 const client = new GranolaClient();
-
-// Or initialize with your API token
-// const client = new GranolaClient('your-api-token');
 
 // Get workspaces
 const workspaces = await client.getWorkspaces();
-console.log(`Found ${workspaces.workspaces?.length} workspaces`);
+console.log(`You have ${workspaces.workspaces.length} workspaces`);
 
-// Get documents from a specific workspace
-const docs = await client.getDocuments({ 
-  workspace_id: 'your-workspace-id', 
-  limit: 10 
-});
-```
+// Get documents
+const documents = await client.getDocuments({ limit: 20 });
+console.log(`Found ${documents.docs.length} documents`);
 
-## Authentication
-
-### Option 1: Automatic Token Retrieval (macOS only)
-
-The client will automatically extract tokens from a local Granola desktop installation on macOS when needed:
-
-```ts
-// No token needed - will be automatically retrieved on first API call
-const client = new GranolaClient();
-```
-
-### Option 2: Direct Token
-
-```ts
-// Use your API token directly
-const client = new GranolaClient('your-api-token');
-```
-
-### Option 3: Manual Token Extraction
-
-The client provides a helper method to manually extract authentication tokens:
-
-```ts
-// Extract tokens from macOS Granola app (Node.js environment only)
-const { accessToken } = await GranolaClient.getAuthTokens();
-
-// Create client with the extracted token
-const client = new GranolaClient(accessToken);
-```
-
-You can also extract the token manually on macOS:
-
-```bash
-jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/Library/Application Support/Granola/supabase.json"
-```
-
-## API Client Methods
-
-### Workspaces
-
-```ts
-// Get all workspaces
-const workspaces = await client.getWorkspaces();
-```
-
-### Documents
-
-```ts
-// Get documents with pagination
-const docs = await client.getDocuments({ 
-  workspace_id: 'your-workspace-id',
-  limit: 20,
-  cursor: 'optional-pagination-cursor'
-});
-
-// Iterate through all documents with automatic pagination
-for await (const doc of client.listAllDocuments({ workspace_id: 'your-workspace-id' })) {
-  console.log(`Document: ${doc.title}`);
-}
-
-// Get document metadata
-const metadata = await client.getDocumentMetadata('document-id');
-
-// Get document transcript
+// Get transcript for a document
 const transcript = await client.getDocumentTranscript('document-id');
-
-// Update document
-await client.updateDocument({
-  document_id: 'document-id',
-  title: 'New Title',
-  notes_markdown: '# Meeting Notes\n\nImportant points...'
-});
-
-// Update document panel
-await client.updateDocumentPanel({
-  document_id: 'document-id',
-  panel_id: 'panel-id',
-  content: { text: 'Updated content' }
-});
+console.log(`Transcript has ${transcript.length} segments`);
 ```
 
-### Other APIs
+## Enhanced Transcript Features
 
-```ts
-// Get panel templates
-const templates = await client.getPanelTemplates();
+The `TranscriptClient` extends the base client with speaker identification and transcript processing:
 
-// Get people data
-const people = await client.getPeople();
+```typescript
+import { TranscriptClient } from 'granola-ts-client';
 
-// Get feature flags
-const featureFlags = await client.getFeatureFlags();
+// Initialize client
+const client = new TranscriptClient();
 
-// Get Notion integration details
-const notionIntegration = await client.getNotionIntegration();
+// Get transcript with speaker identification
+const transcriptWithSpeakers = await client.getDocumentTranscriptWithSpeakers('document-id');
 
-// Get subscription information
-const subscriptions = await client.getSubscriptions();
-
-// Refresh Google Calendar events
-await client.refreshGoogleEvents();
-
-// Check for application updates
-const updateInfo = await client.checkForUpdate();
-```
-
-## Client Configuration
-
-The client automatically mimics the official Granola desktop app to bypass API validation. You can customize various aspects of the client if needed:
-
-```ts
-const client = new GranolaClient('your-api-token', {
-  // API configuration
-  baseUrl: 'https://api.granola.ai',
-  timeout: 10000,
-  retries: 3,
-  
-  // Client identification (defaults shown)
-  appVersion: '6.4.0',
-  clientType: 'electron',
-  clientPlatform: 'darwin',
-  clientArchitecture: 'arm64',
-  electronVersion: '33.4.5',
-  chromeVersion: '130.0.6723.191',
-  nodeVersion: '20.18.3',
-  osVersion: '15.3.1',
-  osBuild: '24D70',
+// Export a formatted transcript to markdown
+await client.exportTranscriptMarkdown('document-id', 'output.md', {
+  groupBySpeaker: true,
+  includeTimestamps: true
 });
 ```
 
-## TypeScript Types
+## Document Panel Access
 
-All types are fully exported for use in your TypeScript code:
+The `PanelClient` provides access to document panels and their structured content:
 
-```ts
-import GranolaClient, { 
-  // Exported interfaces
-  PeopleResponse, 
-  FeatureFlagsResponse,
-  NotionIntegrationResponse,
-  SubscriptionsResponse,
-  ClientOpts,
-  HttpOpts,
-  
-  // Generated OpenAPI schema types
-  components,
-  paths
-} from 'granola-ts-client';
+```typescript
+import { PanelClient } from 'granola-ts-client';
 
-// Use with type annotations
-const people: PeopleResponse = await client.getPeople();
+// Initialize client
+const client = new PanelClient();
 
-// Use generated schema types
-type Document = components['schemas']['Document'];
-type WorkspaceResponse = components['schemas']['WorkspaceResponse'];
+// Get all panels for a document
+const panels = await client.getDocumentPanels('document-id');
+console.log(`Document has ${panels.length} panels`);
+
+// Get a specific panel by title
+const summaryPanel = await client.getDocumentPanelByTitle('document-id', 'Summary');
+
+// Extract structured content from a panel
+if (summaryPanel) {
+  const sections = client.extractStructuredContent(summaryPanel);
+  console.log('Introduction:', sections['Introduction']);
+  console.log('Key Decisions:', sections['Key Decisions']);
+}
+```
+
+## Organization Detection
+
+The library includes an organization detection system that can be customized:
+
+```typescript
+import { OrganizationDetector } from 'granola-ts-client';
+
+// Create detector with custom configuration
+const detector = OrganizationDetector.fromFile('./organization-config.json');
+
+// Detect organization for a meeting
+const meetingData = await client.getDocuments({ limit: 1 });
+const meeting = meetingData.docs[0];
+const organization = detector.detectOrganization(meeting);
+console.log(`Meeting belongs to: ${organization}`);
+```
+
+### Organization Configuration
+
+Create a file named `organization-config.json` with your organization definitions:
+
+```json
+{
+  "organizations": [
+    {
+      "name": "Organization1",
+      "titleKeywords": ["org1", "team1"],
+      "emailDomains": ["org1.com"],
+      "emailAddresses": ["admin@org1.com"],
+      "companyNames": ["Organization One, Inc."]
+    },
+    {
+      "name": "Organization2",
+      "titleKeywords": ["org2", "team2"],
+      "emailDomains": ["org2.org"],
+      "emailAddresses": ["admin@org2.org"],
+      "companyNames": ["Organization Two, LLC"]
+    }
+  ],
+  "defaultOrganization": "Unknown"
+}
 ```
 
 ## Development
 
-### Requirements
-
-This project uses [Bun](https://bun.sh) as the JavaScript/TypeScript runtime.
-
 ```bash
 # Install dependencies
 bun install
+
+# Run tests
+bun test
+
+# Build
+bun run build
 ```
-
-### Available Scripts
-
-| Command              | Description                                     |
-|----------------------|-------------------------------------------------|
-| `bun run generate`   | Generate TypeScript types from `openapi.yaml`   |
-| `bun run build`      | Build ESM bundle to `dist/`                     |
-| `bun run test`       | Run tests                                       |
-| `bun run lint`       | Run biome lint checks                           |
-| `bun run format`     | Format code with biome                          |
-| `bun run ci`         | Run CI tasks manually (lint, test, build)       |
 
 ## License
 

@@ -1,0 +1,22 @@
+{
+  "organizations": [
+    {
+      "name": "Mindshift",
+      "titleKeywords": ["mindshift", "meet this moment"],
+      "emailDomains": ["mindshiftrecovery.org", "mindshiftrecovery.com"],
+      "emailAddresses": ["josh@mindshiftrecovery.org"],
+      "companyNames": ["Mindshift Recovery"]
+    },
+    {
+      "name": "OMAI",
+      "titleKeywords": ["omai", "team talk"],
+      "emailDomains": ["omaihq.com"],
+      "emailAddresses": ["josh@omaihq.com"],
+      "companyNames": ["OMAI"]
+    }
+  ],
+  "defaultOrganization": "Unknown",
+  "useCalendarData": true,
+  "usePeopleData": true,
+  "useTitleKeywords": true
+}
