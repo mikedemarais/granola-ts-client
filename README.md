@@ -20,11 +20,8 @@ bun add granola-ts-client
 ```ts
 import GranolaClient from 'granola-ts-client';
 
-// Initialize with automatic token retrieval (macOS only)
-const client = new GranolaClient();
-
-// Or initialize with your API token
-// const client = new GranolaClient('your-api-token');
+// Initialize with your API token
+const client = new GranolaClient('your-api-token');
 
 // Get workspaces
 const workspaces = await client.getWorkspaces();
@@ -39,38 +36,10 @@ const docs = await client.getDocuments({
 
 ## Authentication
 
-### Option 1: Automatic Token Retrieval (macOS only)
-
-The client will automatically extract tokens from a local Granola desktop installation on macOS when needed:
+Always provide your Granola access token when creating the client:
 
 ```ts
-// No token needed - will be automatically retrieved on first API call
-const client = new GranolaClient();
-```
-
-### Option 2: Direct Token
-
-```ts
-// Use your API token directly
 const client = new GranolaClient('your-api-token');
-```
-
-### Option 3: Manual Token Extraction
-
-The client provides a helper method to manually extract authentication tokens:
-
-```ts
-// Extract tokens from macOS Granola app (Node.js environment only)
-const { accessToken } = await GranolaClient.getAuthTokens();
-
-// Create client with the extracted token
-const client = new GranolaClient(accessToken);
-```
-
-You can also extract the token manually on macOS:
-
-```bash
-jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/Library/Application Support/Granola/supabase.json"
 ```
 
 ## API Client Methods
