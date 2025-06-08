@@ -1,4 +1,4 @@
-import GranolaClient from './src/index';
+import GranolaClient from "./src/index";
 
 // Example usage of the client
 async function main() {
@@ -20,18 +20,19 @@ async function main() {
         
         console.log(`First 5 documents in workspace ${workspaceId}:`);
         if (docs.docs && docs.docs.length > 0) {
-          docs.docs.forEach(doc => {
+          for (const doc of docs.docs) {
             console.log(`- ${doc.title} (${doc.id})`);
-          });
+          }
         } else {
-          console.log('No documents found');
+          console.log("No documents found");
         }
       }
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 }
 
 // Run the example
 main();
+
