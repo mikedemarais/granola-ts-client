@@ -76,12 +76,18 @@
   - `complexity/noExcessiveCognitiveComplexity` warns when a function becomes too complex.
   - `suspicious/noConsole` warns on `console` usage except for `warn`, `error`, and `info` calls.
 
+### Documentation Consistency
+
+- README snippets and `examples/*.ts` must compile against the current generated client.
+- After running `bun run generate`, run `bun run docs:check` to compile the examples and verify key README snippets.
+
 ### Pre-commit Checklist
 
 - `bun run format` - format the code
 - `bun run lint` - fix and check lint issues
 - `bun run ci` - run tests and build
 - Write commit messages in present tense and describe the change clearly.
+- Update README snippets and examples when generated methods change and verify with `bun run docs:check`.
 
 ### File Synchronization
 
