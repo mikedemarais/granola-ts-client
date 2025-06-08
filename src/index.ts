@@ -1,6 +1,6 @@
 // src/index.ts
 export * from "./client";
-export { default } from "./client";
+export { GranolaClient as default } from "./client";
 export * from "./http";
 export * from "./pagination";
 
