@@ -1,5 +1,3 @@
-import ky, { type KyInstance } from "ky";
-
 export interface HttpOpts {
 	timeout?: number;
 	retries?: number;
@@ -30,7 +28,6 @@ export class Http {
 	private readonly osVersion: string;
 	private readonly osBuild: string;
 	private readonly clientHeaders: Record<string, string>;
-	private ky: KyInstance;
 
 	constructor(
 		token?: string,
@@ -51,17 +48,6 @@ export class Http {
 		this.osVersion = opts.osVersion ?? "15.3.1";
 		this.osBuild = opts.osBuild ?? "24D70";
 		this.clientHeaders = opts.clientHeaders ?? {};
-
-		this.ky = ky.create({
-			prefixUrl: this.baseUrl,
-			timeout: this.timeout,
-			retry: {
-				limit: this.retries,
-				methods: ["get", "post"],
-				statusCodes: [408, 413, 429, 500, 502, 503, 504],
-			},
-			throwHttpErrors: false,
-		});
 	}
 
 	public setToken(token: string): void {
@@ -91,39 +77,56 @@ export class Http {
 		body?: unknown,
 	): Promise<T> {
 		const cleanPath = path.replace(/^\//, "");
+		const url = `${this.baseUrl}/${cleanPath}`;
 		let lastError: unknown;
 		for (let attempt = 0; attempt <= this.retries; attempt++) {
-			const res = await this.ky(cleanPath, {
-				method,
-				headers: this.buildHeaders(
-					method === "POST" ? "application/json" : undefined,
-				),
-				...(body !== undefined ? { json: body } : {}),
-			});
+			const controller = new AbortController();
+			const timer = setTimeout(() => controller.abort(), this.timeout);
+			try {
+				const res = await fetch(url, {
+					method,
+					headers: this.buildHeaders(
+						method === "POST" ? "application/json" : undefined,
+					),
+					...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+					signal: controller.signal,
+				});
+				clearTimeout(timer);
 
-			if (res.ok) {
-				if (process.env.NODE_ENV === "test") {
-					return res.json<T>();
+				if (res.ok) {
+					if (process.env.NODE_ENV === "test") {
+						return res.json<T>();
+					}
+					const contentType = res.headers.get("content-type") ?? "";
+					if (contentType.includes("application/json")) {
+						return res.json<T>();
+					}
+					return undefined as T;
 				}
-				const contentType = res.headers.get("content-type") ?? "";
-				if (contentType.includes("application/json")) {
-					return res.json<T>();
+
+				if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
+					const retryAfter = res.headers.get("Retry-After");
+					const delayMs = retryAfter
+						? Number(retryAfter) * 1000
+						: 2 ** attempt * 250;
+					await new Promise((resolve) => setTimeout(resolve, delayMs));
+					lastError = new Error(`HTTP ${res.status}`);
+					continue;
 				}
-				return undefined as T;
-			}
 
-			if (res.status === 429 || (res.status >= 500 && res.status < 600)) {
-				const retryAfter = res.headers.get("Retry-After");
-				const delayMs = retryAfter
-					? Number(retryAfter) * 1000
-					: 2 ** attempt * 250;
-				await new Promise((resolve) => setTimeout(resolve, delayMs));
-				lastError = new Error(`HTTP ${res.status}`);
-				continue;
+				const text = await res.text();
+				throw new Error(`HTTP ${res.status} ${res.statusText}: ${text}`);
+			} catch (error) {
+				clearTimeout(timer);
+				lastError = error;
+				if (attempt < this.retries) {
+					await new Promise((resolve) =>
+						setTimeout(resolve, 2 ** attempt * 250),
+					);
+					continue;
+				}
+				throw error;
 			}
-
-			const text = await res.text();
-			throw new Error(`HTTP ${res.status} ${res.statusText}: ${text}`);
 		}
 		throw lastError;
 	}
@@ -138,10 +141,15 @@ export class Http {
 
 	public async getText(path: string): Promise<string> {
 		const cleanPath = path.replace(/^\//, "");
-		const res = await this.ky(cleanPath, {
+		const url = `${this.baseUrl}/${cleanPath}`;
+		const controller = new AbortController();
+		const timer = setTimeout(() => controller.abort(), this.timeout);
+		const res = await fetch(url, {
 			method: "GET",
 			headers: this.buildHeaders(),
+			signal: controller.signal,
 		});
+		clearTimeout(timer);
 		if (!res.ok) {
 			const text = await res.text();
 			throw new Error(`HTTP ${res.status} ${res.statusText}: ${text}`);

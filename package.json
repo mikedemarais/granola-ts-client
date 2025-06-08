@@ -30,9 +30,7 @@
 		"ci": "rm -rf dist && bun run format && bun run lint:check && bun run test && bun run build",
 		"prepublishOnly": "bun run ci"
 	},
-	"dependencies": {
-		"ky": "^1.8.1"
-	},
+	"dependencies": {},
 	"devDependencies": {
 		"@types/bun": "latest",
 		"@biomejs/biome": "latest",

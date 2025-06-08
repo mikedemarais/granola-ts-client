@@ -1,5 +1,13 @@
 // tests/http.test.ts
-import { beforeAll, beforeEach, describe, expect, it } from "bun:test";
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+} from "bun:test";
 import { Http } from "../src/http";
 
 // Set NODE_ENV for testing
@@ -11,6 +19,9 @@ describe("Http client", () => {
 	let originalFetch: typeof fetch;
 	beforeEach(() => {
 		originalFetch = globalThis.fetch;
+	});
+	afterEach(() => {
+		globalThis.fetch = originalFetch;
 	});
 
 	it("should perform POST request and parse JSON response", async () => {
@@ -32,7 +43,6 @@ describe("Http client", () => {
 		const data = await http.post<{ data: number }>("/test", { foo: "bar" });
 		expect(data).toEqual({ data: 123 });
 		expect(called).toBe(true);
-		globalThis.fetch = originalFetch;
 	});
 
 	it("should retry on server errors and succeed", async () => {
@@ -51,7 +61,6 @@ describe("Http client", () => {
 		const data = await http.post<{ ok: boolean }>("/retry");
 		expect(data).toEqual({ ok: true });
 		expect(attempts).toBe(2);
-		globalThis.fetch = originalFetch;
 	});
 
 	it("should include client identification headers by default", async () => {
@@ -78,8 +87,6 @@ describe("Http client", () => {
 		expect(ua).toContain("Electron/33.4.5");
 		expect(ua).toContain("Chrome/130.0.6723.191");
 		expect(ua).toContain("Node/20.18.3");
-
-		globalThis.fetch = originalFetch;
 	});
 
 	it("should allow customizing all client identification parameters", async () => {
@@ -114,7 +121,5 @@ describe("Http client", () => {
 		expect(headers?.get("User-Agent")).toBe(
 			"Granola/7.0.0 Electron/40.0.0 Chrome/140.0.0.0 Node/21.0.0 (macOS 11.0.0 build123)",
 		);
-
-		globalThis.fetch = originalFetch;
 	});
 });
