@@ -33,6 +33,7 @@ const docs = await client.v2_get_documents({
   limit: 10
 });
 ```
+See [`examples/quick-start.ts`](examples/quick-start.ts) for a runnable example that demonstrates this workflow.
 
 ## Get Granola Access Token
 
@@ -181,6 +182,13 @@ const client = new GranolaClient('your-api-token', {
 });
 ```
 
+## HTTP Utility
+
+All generated API calls use the `Http` class defined in
+[`src/http.ts`](src/http.ts) for network communication. Import and use this
+class directly if you need to make custom requests that the generated client
+doesn't expose.
+
 ## Types
 
 All types are fully exported for use in your TypeScript code:
@@ -208,7 +216,9 @@ let workspace: WorkspaceResponse;
 ```
 ## Generate Types
 
-Run `bun run generate` to refresh client and schema types from `openapi.yaml`. CI executes this before building.
+Run `bun run generate` to refresh client and schema types from `openapi.yaml`. The command writes
+the API client and models to `src/generated/`, which are committed to the
+repository. CI runs this step automatically before building.
 
 
 ## Development
