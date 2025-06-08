@@ -208,7 +208,7 @@ let workspace: WorkspaceResponse;
 ```
 ## Generating Types
 
-Run `bun run generate` to refresh types from `openapi.yaml`. CI executes this before building.
+Run `bun run generate` to refresh client and schema types from `openapi.yaml`. CI executes this before building.
 
 
 ## Development

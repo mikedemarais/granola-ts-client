@@ -17,7 +17,7 @@
 	"module": "./dist/index.js",
 	"files": ["dist", "README.md", "LICENSE"],
 	"scripts": {
-		"generate": "bunx openapi-typescript-codegen --input openapi.yaml --output src/generated --client fetch",
+		"generate": "bunx openapi-typescript-codegen --input openapi.yaml --output src/generated --client fetch && bunx openapi-typescript openapi.yaml -o src/schema.d.ts",
 		"build": "bun run generate && bun build src/index.ts --outdir dist && bun run build:types",
 		"build:types": "tsc -p tsconfig.build.json",
 		"test": "bun test",
@@ -33,6 +33,7 @@
 		"@types/bun": "latest",
 		"@biomejs/biome": "latest",
 		"openapi-typescript-codegen": "^0.29.0",
+		"openapi-typescript": "^7.8.0",
 		"typescript": "^5.0.0"
 	},
 	"peerDependencies": {
