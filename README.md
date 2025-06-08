@@ -168,7 +168,7 @@ const client = new GranolaClient('your-api-token', {
   baseUrl: 'https://api.granola.ai',
   timeout: 10000,
   retries: 3,
-  
+
   // Client identification (defaults shown)
   appVersion: '6.4.0',
   clientType: 'electron',
