@@ -57,6 +57,13 @@
 - Branch naming convention: `feature/short-description` or `fix/issue-reference`
 - Before opening a pull request, run `bun run ci` and regenerate schema types with `bun run generate`
 
+### Pull Request Guidelines
+
+- Use a short title written in the imperative mood (e.g., "Add feature" not "Added feature").
+- Summarize what changed and why in the description.
+- Include a **Testing** section describing the results of `bun run format`, `bun run lint`, and `bun run ci`.
+- Reference related issues or pull requests when applicable.
+
 ### Biome Usage
 
 - Use [Biome](https://biomejs.dev/) for all code formatting and linting.
@@ -64,6 +71,13 @@
 - The configuration lives in `.biome.json` which excludes `node_modules`, `coverage`, and `*.lock` files
 - The CI process ensures clean builds by removing the `dist/` folder before linting to avoid conflicts with generated code
 - The Node import rule is disabled because the project uses Bun; add `// biome-ignore lint/style/useNodejsImportProtocol` for dynamic imports if needed.
+
+### Pre-commit Checklist
+
+- `bun run format` - format the code
+- `bun run lint` - fix and check lint issues
+- `bun run ci` - run tests and build
+- Write commit messages in present tense and describe the change clearly.
 
 ### File Synchronization
 
