@@ -192,25 +192,25 @@ const client = new GranolaClient('your-api-token', {
 All types are fully exported for use in your TypeScript code:
 
 ```ts
-import GranolaClient, { 
+import GranolaClient, {
   // Exported interfaces
-  PeopleResponse, 
+  PeopleResponse,
   FeatureFlagsResponse,
   NotionIntegrationResponse,
   SubscriptionsResponse,
   ClientOpts,
-  
-  // Generated OpenAPI schema types
-  components,
-  paths
+
+  // Generated API models
+  Document,
+  WorkspaceResponse,
 } from 'granola-ts-client';
 
 // Use with type annotations
 const people: PeopleResponse = await client.v1_get_people();
 
-// Use generated schema types
-type Document = components['schemas']['Document'];
-type WorkspaceResponse = components['schemas']['WorkspaceResponse'];
+// Use generated models
+let doc: Document;
+let workspace: WorkspaceResponse;
 ```
 ## Generating Types
 
@@ -233,8 +233,8 @@ bun install
 
 | Command              | Description                                           |
 |----------------------|-------------------------------------------------------|
-| `bun run generate`   | Generate TypeScript types from `openapi.yaml`        |
-| `bun run build`      | Compile the package, copy the generated schema, and create type definitions |
+| `bun run generate`   | Generate client and models from `openapi.yaml`       |
+| `bun run build`      | Generate client, build ESM bundle, and create type definitions |
 | `bun run test`       | Run tests                                             |
 | `bun run lint`       | Auto-fix linting and formatting issues with Biome    |
 | `bun run lint:check` | Check for linting issues without auto-fixing         |
