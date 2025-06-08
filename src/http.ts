@@ -44,8 +44,6 @@ export class Http {
 	private osVersion: string;
 	private osBuild: string;
 	private clientHeaders: Record<string, string>;
-	private tokenProvider?: () => Promise<string>;
-	private isTokenBeingFetched = false;
 
 	constructor(
 		token?: string,
@@ -76,13 +74,29 @@ export class Http {
 		this.token = token;
 	}
 
-	/**
-	 * Set a function that provides a token when needed.
-	 * This will be called lazily when making a request without a token.
-	 * @param provider Function that returns a Promise resolving to a token
-	 */
-	public setTokenProvider(provider: () => Promise<string>): void {
-		this.tokenProvider = provider;
+	private buildHeaders(contentType?: string): Record<string, string> {
+		const headers: Record<string, string> = {};
+		if (contentType) {
+			headers["Content-Type"] = contentType;
+		}
+		if (contentType === "application/json") {
+			headers.Accept = "application/json";
+		}
+
+		if (this.token) {
+			headers.Authorization = `Bearer ${this.token}`;
+		}
+
+		headers["X-App-Version"] = this.appVersion;
+		headers["User-Agent"] =
+			`Granola/${this.appVersion} Electron/${this.electronVersion} Chrome/${this.chromeVersion} Node/${this.nodeVersion} (macOS ${this.osVersion} ${this.osBuild})`;
+		headers["X-Client-Type"] = this.clientType;
+		headers["X-Client-Platform"] = this.clientPlatform;
+		headers["X-Client-Architecture"] = this.clientArchitecture;
+		headers["X-Client-Id"] = `granola-${this.clientType}-${this.appVersion}`;
+
+		Object.assign(headers, this.clientHeaders);
+		return headers;
 	}
 
 	private async delay(ms: number): Promise<void> {
@@ -100,83 +114,18 @@ export class Http {
 		return 2 ** attempt * 250;
 	}
 
-	/**
-	 * Ensures that a valid token is available before making a request.
-	 * Uses a token provider if one is set and no token is available.
-	 * @returns A promise that resolves when a valid token is ready
-	 */
-	private async ensureToken(): Promise<void> {
-		// If we already have a token, no need to fetch one
-		if (this.token) {
-			return;
-		}
-
-		// If we don't have a token provider, nothing to do
-		if (!this.tokenProvider) {
-			return;
-		}
-
-		// Simple lock to prevent multiple concurrent token fetches
-		if (this.isTokenBeingFetched) {
-			// Wait a bit for the other fetch to complete
-			for (let i = 0; i < 10; i++) {
-				await this.delay(100);
-				if (this.token) {
-					return;
-				}
-			}
-		}
-
-		try {
-			this.isTokenBeingFetched = true;
-			this.token = await this.tokenProvider();
-		} catch (error) {
-			console.error("Error fetching token:", error);
-			throw new Error(
-				`Failed to retrieve authentication token: ${(error as Error).message}`,
-			);
-		} finally {
-			this.isTokenBeingFetched = false;
-		}
-	}
-
 	private async request<T>(
 		method: string,
 		path: string,
 		body?: unknown,
 	): Promise<T> {
-		// Try to ensure we have a token before making the request
-		await this.ensureToken();
-
 		const url = new URL(path, this.baseUrl).toString();
 		let lastError: unknown;
 		for (let attempt = 0; attempt <= this.retries; attempt++) {
 			const controller = new AbortController();
 			const timer = setTimeout(() => controller.abort(), this.timeout);
 			try {
-				const headers: Record<string, string> = {
-					"Content-Type": "application/json",
-					Accept: "application/json",
-				};
-
-				// Only add authorization header if token is provided
-				if (this.token) {
-					headers.Authorization = `Bearer ${this.token}`;
-				}
-
-				// Add client identification headers (always enabled)
-				// Standard client headers
-				headers["X-App-Version"] = this.appVersion;
-				headers["User-Agent"] =
-					`Granola/${this.appVersion} Electron/${this.electronVersion} Chrome/${this.chromeVersion} Node/${this.nodeVersion} (macOS ${this.osVersion} ${this.osBuild})`;
-				headers["X-Client-Type"] = this.clientType;
-				headers["X-Client-Platform"] = this.clientPlatform;
-				headers["X-Client-Architecture"] = this.clientArchitecture;
-				headers["X-Client-Id"] =
-					`granola-${this.clientType}-${this.appVersion}`;
-
-				// Add any additional client headers
-				Object.assign(headers, this.clientHeaders);
+				const headers = this.buildHeaders("application/json");
 				const init: RequestInit = {
 					method,
 					headers,
@@ -249,29 +198,8 @@ export class Http {
 	 * Perform a GET request and return raw text.
 	 */
 	public async getText(path: string): Promise<string> {
-		// Try to ensure we have a token before making the request
-		await this.ensureToken();
-
 		const url = new URL(path, this.baseUrl).toString();
-		const headers: Record<string, string> = {};
-
-		// Only add authorization header if token is provided
-		if (this.token) {
-			headers.Authorization = `Bearer ${this.token}`;
-		}
-
-		// Add client identification headers (always enabled)
-		// Standard client headers
-		headers["X-App-Version"] = this.appVersion;
-		headers["User-Agent"] =
-			`Granola/${this.appVersion} Electron/${this.electronVersion} Chrome/${this.chromeVersion} Node/${this.nodeVersion} (macOS ${this.osVersion} ${this.osBuild})`;
-		headers["X-Client-Type"] = this.clientType;
-		headers["X-Client-Platform"] = this.clientPlatform;
-		headers["X-Client-Architecture"] = this.clientArchitecture;
-		headers["X-Client-Id"] = `granola-${this.clientType}-${this.appVersion}`;
-
-		// Add any additional client headers
-		Object.assign(headers, this.clientHeaders);
+		const headers = this.buildHeaders();
 
 		const res = await fetch(url, { method: "GET", headers });
 		if (!res.ok) {

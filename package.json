@@ -1,6 +1,6 @@
 {
 	"name": "granola-ts-client",
-	"version": "0.7.0",
+	"version": "0.8.0",
 	"description": "TypeScript client for the Granola API with automatic client validation bypass",
 	"type": "module",
 	"exports": {
@@ -18,7 +18,8 @@
 	"files": ["dist", "README.md", "LICENSE"],
 	"scripts": {
 		"generate": "openapi-typescript openapi.yaml -o src/schema.d.ts",
-		"build": "bun build src/index.ts --outdir dist && bun run build:types && bun run build:schema",
+		"generate:client": "bun scripts/generate-client.ts",
+		"build": "bun run generate && bun build src/index.ts --outdir dist && bun run build:types && bun run build:schema",
 		"build:types": "tsc -p tsconfig.build.json",
 		"build:schema": "cp src/schema.d.ts dist/",
 		"test": "bun test",

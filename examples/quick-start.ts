@@ -1,10 +1,13 @@
-import GranolaClient from "./src/index";
+import GranolaClient from "../src/index";
 
 // Example usage of the client
 async function main() {
 	try {
-		// Make sure GRANOLA_TOKEN is set in your environment or .env file
-		const client = new GranolaClient();
+		const token = process.env.GRANOLA_ACCESS_TOKEN;
+		if (!token) {
+			throw new Error("GRANOLA_ACCESS_TOKEN env var not set");
+		}
+		const client = new GranolaClient(token);
 
 		// Get workspaces
 		const workspaces = await client.getWorkspaces();

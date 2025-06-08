@@ -29,6 +29,15 @@
 - Maintain 80%+ test coverage for all new code
 - Use async/await syntax rather than Promises with then/catch
 
+### Linting and Formatting
+
+- **Biome** is configured for both linting and formatting with auto-fix enabled
+- `bun run lint` - Auto-fixes all fixable formatting and linting issues
+- `bun run lint:check` - Checks for issues without making changes (used in CI)
+- `bun run format` - Formats code only
+- Import organization is automatically handled by Biome
+- Generated code in `dist/` is avoided during CI by using a clean build process that removes build artifacts before linting
+
 ### TypeScript and Type Exports
 
 - All public-facing types must be explicitly exported from the package

@@ -107,119 +107,24 @@ export class GranolaClient {
 	private http: Http;
 
 	/**
-	 * Extract authentication tokens from a local Granola app installation.
-	 * This can be used to obtain tokens for authenticating with the API and bypassing
-	 * the "Unsupported client" validation by using the same tokens as the official app.
-	 *
-	 * Note: This requires:
-	 * - Running in a Node.js environment
-	 * - Having the Granola desktop app installed and logged in on macOS
-	 * - Access to the Granola tokens file at ~/Library/Application Support/Granola/supabase.json
-	 * - Only macOS is supported
-	 *
-	 * @returns Object containing access and refresh tokens from the official Granola app
-	 * @throws Error if tokens cannot be read or parsed
-	 * @example
-	 * ```ts
-	 * // Get tokens from the local Granola app
-	 * const { accessToken } = await GranolaClient.getAuthTokens();
-	 *
-	 * // Create a client with the extracted token
-	 * const client = new GranolaClient(accessToken);
-	 *
-	 * // API calls will work without "Unsupported client" errors
-	 * const workspaces = await client.getWorkspaces();
-	 * ```
-	 */
-	public static async getAuthTokens(): Promise<{
-		accessToken: string;
-		refreshToken: string;
-	}> {
-		try {
-			// This requires running in a Node.js environment
-			if (typeof process === "undefined" || typeof require !== "function") {
-				throw new Error(
-					"getAuthTokens can only be used in a Node.js environment",
-				);
-			}
-
-			// Dynamically import required modules
-			// biome-ignore lint/style/useNodejsImportProtocol: TypeScript build lacks Node type definitions
-			const fs = await import("fs");
-			// biome-ignore lint/style/useNodejsImportProtocol: TypeScript build lacks Node type definitions
-			const path = await import("path");
-			// biome-ignore lint/style/useNodejsImportProtocol: TypeScript build lacks Node type definitions
-			const os = await import("os");
-
-			// Path to Granola app support directory (macOS only)
-			const homedir = os.homedir();
-			const granolaDir = path.join(
-				homedir,
-				"Library/Application Support/Granola",
-			);
-			const supabaseFilePath = path.join(granolaDir, "supabase.json");
-
-			// Check if the file exists
-			if (!fs.existsSync(supabaseFilePath)) {
-				throw new Error(
-					`Granola token file not found at ${supabaseFilePath}. Make sure Granola desktop app is installed and you're logged in. The expected path is: ~/Library/Application Support/Granola/supabase.json`,
-				);
-			}
-
-			// Read and parse the tokens
-			const supabaseData = JSON.parse(
-				fs.readFileSync(supabaseFilePath, "utf8"),
-			);
-
-			if (!supabaseData.cognito_tokens) {
-				throw new Error(`No cognito_tokens found in ${supabaseFilePath}`);
-			}
-
-			const cognitoTokens = JSON.parse(supabaseData.cognito_tokens);
-
-			return {
-				accessToken: cognitoTokens.access_token,
-				refreshToken: cognitoTokens.refresh_token,
-			};
-		} catch (error) {
-			console.error("Error extracting Granola authentication tokens:", error);
-			throw new Error(
-				`Failed to extract authentication tokens: ${(error as Error).message}`,
-			);
-		}
-	}
-
-	/**
 	 * Create a new GranolaClient.
-	 * @param token API authentication token (optional - will be automatically retrieved if not provided)
+	 * @param token API authentication token
 	 * @param opts HTTP and client options
 	 * @example
 	 * ```ts
-	 * // Auto-retrieval of token from local Granola installation
-	 * const client = new GranolaClient();
+	 * const client = new GranolaClient('your_token');
 	 *
-	 * // Basic client with explicitly provided token
-	 * const client = new GranolaClient("your_token");
-	 *
-	 * // Client with custom client identification
-	 * const client = new GranolaClient("your_token", {
-	 *   appVersion: "6.5.0",
-	 *   clientType: "electron",
-	 *   clientPlatform: "darwin",
-	 *   clientArchitecture: "arm64"
+	 * // Client with custom identification
+	 * const client = new GranolaClient('your_token', {
+	 *   appVersion: '6.5.0',
+	 *   clientType: 'electron',
+	 *   clientPlatform: 'darwin',
+	 *   clientArchitecture: 'arm64'
 	 * });
 	 * ```
 	 */
-	constructor(token?: string, opts: ClientOpts = {}) {
+	constructor(token: string, opts: ClientOpts = {}) {
 		this.http = new Http(token, opts.baseUrl, opts);
-
-		// If no token is provided, we'll lazily fetch it when needed
-		if (!token) {
-			this.http.setTokenProvider(async () => {
-				const { accessToken } = await GranolaClient.getAuthTokens();
-				return accessToken;
-			});
-		}
 	}
 
 	/**
