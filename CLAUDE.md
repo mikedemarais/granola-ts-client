@@ -55,6 +55,7 @@
   - Modifying multiple files simultaneously
   - Switching between features/tasks
 - Branch naming convention: `feature/short-description` or `fix/issue-reference`
+- Before opening a pull request, run `bun run ci` and regenerate schema types with `bun run generate`
 
 ### Biome Usage
 
