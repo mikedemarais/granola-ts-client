@@ -1,6 +1,6 @@
 # granola-ts-client
 
-A TypeScript client for the Granola API. This client allows you to interact with Granola's note-taking and meeting management platform programmatically while automatically mimicking the official Granola desktop application to bypass "Unsupported client" validation.
+A TypeScript client for the Granola API. The OpenAPI spec in this repository is reverse-engineered and unofficial. The client automatically mimics the official desktop application to bypass "Unsupported client" validation.
 
 ## Installation
 
@@ -34,7 +34,7 @@ const docs = await client.v2_get_documents({
 });
 ```
 
-## Getting Your Access Token
+## Retrieve Your Token
 
 You need a Granola access token to use this client. Here are the easiest ways to get one:
 
@@ -212,6 +212,10 @@ const people: PeopleResponse = await client.v1_get_people();
 type Document = components['schemas']['Document'];
 type WorkspaceResponse = components['schemas']['WorkspaceResponse'];
 ```
+## Generating Types
+
+Run `bun run generate` to update the TypeScript definitions from `openapi.yaml`. The CI workflow in `.github/workflows/ci.yml` runs this command before it builds the package with `bun run build`.
+
 
 ## Development
 
@@ -224,11 +228,6 @@ This project uses [Bun](https://bun.sh) as the JavaScript/TypeScript runtime.
 bun install
 ```
 
-### Generating Types
-
-Run `bun run generate` to update the TypeScript definitions from `openapi.yaml`.
-The CI workflow in `.github/workflows/ci.yml` runs this command before it
-builds the package with `bun run build`.
 
 ### Available Scripts
 
