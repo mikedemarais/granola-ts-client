@@ -1,6 +1,5 @@
 // tests/http.test.ts
 import {
-	afterAll,
 	afterEach,
 	beforeAll,
 	beforeEach,

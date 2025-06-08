@@ -95,11 +95,11 @@ export class Http {
 
 				if (res.ok) {
 					if (process.env.NODE_ENV === "test") {
-						return res.json<T>();
+						return res.json() as Promise<T>;
 					}
 					const contentType = res.headers.get("content-type") ?? "";
 					if (contentType.includes("application/json")) {
-						return res.json<T>();
+						return res.json() as Promise<T>;
 					}
 					return undefined as T;
 				}
