@@ -71,6 +71,9 @@
 - The configuration lives in `.biome.json` which excludes `node_modules`, `coverage`, and `*.lock` files
 - The CI process ensures clean builds by removing the `dist/` folder before linting to avoid conflicts with generated code
 - The Node import rule is disabled because the project uses Bun; add `// biome-ignore lint/style/useNodejsImportProtocol` for dynamic imports if needed.
+- Additional lint rules help keep the codebase clean:
+  - `complexity/noExcessiveCognitiveComplexity` warns when a function becomes too complex.
+  - `suspicious/noConsole` warns on `console` usage except for `warn`, `error`, and `info` calls.
 
 ### Pre-commit Checklist
 

@@ -7,7 +7,12 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
-			"style/useNodejsImportProtocol": "off"
+			"style/useNodejsImportProtocol": "off",
+			"complexity/noExcessiveCognitiveComplexity": "warn",
+			"suspicious/noConsole": {
+				"level": "warn",
+				"options": { "allow": ["warn", "error", "info"] }
+			}
 		}
 	},
 	"formatter": { "enabled": true },

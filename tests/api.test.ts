@@ -6,7 +6,7 @@ import { GranolaClient } from "../src";
 describe("API connectivity (manual test)", () => {
 	it("should fetch workspaces from the Granola API", async () => {
 		// Always skip this test in automated runs and CI
-		console.log("Skipping API connectivity test - requires manual token");
+		console.info("Skipping API connectivity test - requires manual token");
 
 		// Mock test pass to avoid failing the build
 		expect(true).toBe(true);

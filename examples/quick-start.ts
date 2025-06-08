@@ -12,7 +12,7 @@ async function main() {
 		// Get workspaces
 		const workspaces = await client.v1_get_workspaces();
 		const workspaceCount = workspaces.workspaces?.length ?? 0;
-		console.log(`Found ${workspaceCount} workspaces`);
+		console.info(`Found ${workspaceCount} workspaces`);
 
 		// Get documents from the first workspace
 		if (workspaces.workspaces && workspaces.workspaces.length > 0) {
@@ -24,13 +24,13 @@ async function main() {
 					limit: 5,
 				});
 
-				console.log(`First 5 documents in workspace ${workspaceId}:`);
+				console.info(`First 5 documents in workspace ${workspaceId}:`);
 				if (docs.docs && docs.docs.length > 0) {
 					for (const doc of docs.docs) {
-						console.log(`- ${doc.title} (${doc.id})`);
+						console.info(`- ${doc.title} (${doc.id})`);
 					}
 				} else {
-					console.log("No documents found");
+					console.info("No documents found");
 				}
 			}
 		}
