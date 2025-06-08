@@ -66,4 +66,4 @@
 
 ### File Synchronization
 
-- Any changes made to `AGENTS.md` **must** also be made in `CLAUDE.md` and vice versa to keep both guideline files identical.
+- Any changes made to `AGENTS.md` **must** also be made in `CLAUDE.md` and vice versa to keep both guideline files identical. You can run `diff AGENTS.md CLAUDE.md` to verify they're in sync.
