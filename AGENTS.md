@@ -21,7 +21,7 @@
 
 ### Code Quality
 
-- Run `bun run dev:lint` during development (auto-fixes issues and runs tests)
+- Run `bun run dev` during development (auto-fixes issues and runs tests)
 - Run `bun run ci` before committing changes to ensure all checks pass
 - Biome automatically fixes most linting and formatting issues when using `bun run lint`
 - The CI process uses a clean build approach: removes dist/, lints source code, runs tests, then builds
