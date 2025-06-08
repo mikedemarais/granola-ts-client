@@ -34,11 +34,11 @@ const docs = await client.v2_get_documents({
 });
 ```
 
-## Retrieve Your Token
+## Get Granola Access Token
 
 Grab a Granola access token using one of these methods:
 
-### Method 1: Local App (macOS/Linux)
+### Method 1: Local App
 
 - Use `jq` to read the token from `supabase.json`:
 
@@ -66,7 +66,7 @@ Grab a Granola access token using one of these methods:
   const client = new GranolaClient(accessToken);
   ```
 
-### Method 2: Browser DevTools (Universal)
+### Method 2: Browser DevTools
 
 - Visit [granola.ai](https://granola.ai) and log in.
 - Open DevTools (F12 or Cmd+Option+I).
@@ -83,7 +83,7 @@ import GranolaClient from 'granola-ts-client';
 const client = new GranolaClient('your-access-token-here');
 ```
 
-## API Client Methods
+## API Methods
 
 ### Workspaces
 
@@ -157,7 +157,7 @@ await client.v1_refresh_google_events();
 const updateInfo = await client.v1_check_for_update_latest_mac_yml();
 ```
 
-## Client Configuration
+## Client Config
 
 The client pretends to be the desktop app so API calls are accepted. Override these values if needed:
 
@@ -181,7 +181,7 @@ const client = new GranolaClient('your-api-token', {
 });
 ```
 
-## TypeScript Types
+## Types
 
 All types are fully exported for use in your TypeScript code:
 
@@ -206,7 +206,7 @@ const people: PeopleResponse = await client.v1_get_people();
 let doc: Document;
 let workspace: WorkspaceResponse;
 ```
-## Generating Types
+## Generate Types
 
 Run `bun run generate` to refresh types from `openapi.yaml`. CI executes this before building.
 
@@ -222,7 +222,7 @@ bun install
 ```
 
 
-### Available Scripts
+### Scripts
 
 | Command              | Description                                           |
 |----------------------|-------------------------------------------------------|
