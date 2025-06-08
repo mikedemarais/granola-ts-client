@@ -1,6 +1,6 @@
 # granola-ts-client
 
-A TypeScript client for the Granola API. The OpenAPI spec in this repository is reverse-engineered and unofficial. The client automatically mimics the official desktop application to bypass "Unsupported client" validation.
+Unofficial TypeScript client for the Granola API. It mimics the desktop app to avoid "Unsupported client" errors.
 
 ## Installation
 
@@ -36,48 +36,42 @@ const docs = await client.v2_get_documents({
 
 ## Retrieve Your Token
 
-You need a Granola access token to use this client. Here are the easiest ways to get one:
+Grab a Granola access token using one of these methods:
 
-### Method 1: Extract from Local Granola App (macOS/Linux)
+### Method 1: Local App (macOS/Linux)
 
-If you have the Granola desktop app installed, you can extract the token from the local storage:
+- Use `jq` to read the token from `supabase.json`:
 
-**Using jq (command line):**
-```bash
-# macOS
-jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/Library/Application Support/Granola/supabase.json"
+  ```bash
+  # macOS
+  jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/Library/Application Support/Granola/supabase.json"
 
-# Linux  
-jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/.config/Granola/supabase.json"
-```
+  # Linux
+  jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/.config/Granola/supabase.json"
+  ```
 
-**Extracting the Granola Access Token within your application:**
-```ts
-import { join } from 'path';
-import { homedir } from 'os';
-import GranolaClient from 'granola-ts-client';
+- Or extract it in code:
 
-// Extract token programmatically within your app
-const granolaPath = process.platform === 'darwin' 
-  ? join(homedir(), 'Library/Application Support/Granola/supabase.json')
-  : join(homedir(), '.config/Granola/supabase.json');
+  ```ts
+  import { join } from 'path';
+  import { homedir } from 'os';
+  import GranolaClient from 'granola-ts-client';
 
-const data = await Bun.file(granolaPath).json();
-const accessToken = JSON.parse(data.cognito_tokens).access_token;
+  const granolaPath = process.platform === 'darwin'
+    ? join(homedir(), 'Library/Application Support/Granola/supabase.json')
+    : join(homedir(), '.config/Granola/supabase.json');
 
-// Use the extracted token with your client
-const client = new GranolaClient(accessToken);
-```
+  const data = await Bun.file(granolaPath).json();
+  const accessToken = JSON.parse(data.cognito_tokens).access_token;
+  const client = new GranolaClient(accessToken);
+  ```
 
 ### Method 2: Browser DevTools (Universal)
 
-1. Open [granola.ai](https://granola.ai) in your browser and log in
-2. Open DevTools (F12 or Cmd+Option+I)
-3. Go to the **Network** tab
-4. Navigate to any page in the Granola web app
-5. Find any API request to `api.granola.ai`
-6. Look at the request headers for `Authorization: Bearer your-token-here`
-7. Copy the token (everything after `Bearer `)
+- Visit [granola.ai](https://granola.ai) and log in.
+- Open DevTools (F12 or Cmd+Option+I).
+- In the **Network** tab, navigate within the app.
+- Grab the `Authorization` header from any `api.granola.ai` request.
 
 ## Authentication
 
@@ -165,7 +159,7 @@ const updateInfo = await client.v1_check_for_update_latest_mac_yml();
 
 ## Client Configuration
 
-The client automatically mimics the official Granola desktop app to bypass API validation. You can customize various aspects of the client if needed:
+The client pretends to be the desktop app so API calls are accepted. Override these values if needed:
 
 ```ts
 const client = new GranolaClient('your-api-token', {
@@ -214,17 +208,16 @@ let workspace: WorkspaceResponse;
 ```
 ## Generating Types
 
-Run `bun run generate` to update the TypeScript definitions from `openapi.yaml`. The CI workflow in `.github/workflows/ci.yml` runs this command before it builds the package with `bun run build`.
+Run `bun run generate` to refresh types from `openapi.yaml`. CI executes this before building.
 
 
 ## Development
 
 ### Requirements
 
-This project uses [Bun](https://bun.sh) as the JavaScript/TypeScript runtime.
+Install dependencies with [Bun](https://bun.sh):
 
 ```bash
-# Install dependencies
 bun install
 ```
 
