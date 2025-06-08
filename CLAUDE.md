@@ -1,92 +1,40 @@
 # Development Guidelines
 
-## Tech Stack & Environment
+## Environment
+- Use [Bun](https://bun.sh/) for all commands.
+- Install dependencies with `bun install`.
+- All code is TypeScript and tests run via `bun test`.
+- Invoke CLI tools with `bun x`.
 
-- **Runtime**: This project uses [Bun](https://bun.sh/) as the JavaScript/TypeScript runtime
-- **Language**: TypeScript is required for all new code
-- **Package Management**: Use Bun's built-in package manager (`bun install`) instead of npm
-- **Testing**: Use Bun's test runner (`bun test`) for all unit and integration tests
-- Always invoke binaries with `bun x` instead of the deprecated `bunx` alias
+## Workflow
+- Prefer Bun APIs over external packages and document new dependencies in PRs.
+- Run `bun run dev` while coding to format, lint and test automatically.
+- Run `bun run ci` before committing; it cleans `dist/`, lints, tests and builds.
+- Avoid modifying `tsconfig.json` and use async/await instead of `.then()` chains.
 
-## Development Practices
+## Linting & Formatting
+- Biome enforces style with `bun run format` and `bun run lint`.
+- `bun run lint:check` runs in CI.
+- Node import protocol is disabled; add `// biome-ignore lint/style/useNodejsImportProtocol` for dynamic imports.
+- Additional rules check complexity and disallow `console` calls except `warn`, `error` and `info`.
 
-### Dependency Management
+## Types
+- Export public types from `src/index.ts` and document them with JSDoc.
+- Verify exports with `bun build`.
 
-- Prefer Bun's native APIs over external dependencies whenever possible
-- Examples of native Bun APIs to leverage:
-  - `Bun.file()` for file operations instead of fs modules
-  - `Bun.serve()` for HTTP servers instead of Express/Fastify
-  - Built-in test runner instead of Jest/Mocha
-  - Built-in bundler instead of webpack/rollup
-- Document any new external dependencies with justification in PR descriptions
+## Git & PRs
+- Make small atomic commits in present tense.
+- Branch names: `feature/...` or `fix/...`.
+- Before a PR, run `bun run generate` and `bun run ci`.
+- PR titles should be imperative and include a summary and **Testing** section listing command results.
 
-### Code Quality
+## Documentation
+- README snippets and files in `examples/` must compile with the generated client.
 
-- Run `bun run dev` during development (auto-fixes issues and runs tests)
-- Run `bun run ci` before committing changes to ensure all checks pass
-- Biome automatically fixes most linting and formatting issues when using `bun run lint`
-- The CI process uses a clean build approach: removes dist/, lints source code, runs tests, then builds
-- Follow the established TypeScript configuration without modifications
-- Do not impose a strict test coverage quota on contributions
-- Use async/await syntax rather than Promises with then/catch
+## Pre-commit
+- `bun run format`
+- `bun run lint`
+- `bun run ci`
 
-### Linting and Formatting
-
-- **Biome** is configured for both linting and formatting with auto-fix enabled
-- `bun run lint` - Auto-fixes all fixable formatting and linting issues
-- `bun run lint:check` - Checks for issues without making changes (used in CI)
-- `bun run format` - Formats code only
-- Import organization is automatically handled by Biome
-- Generated code in `dist/` is avoided during CI by using a clean build process that removes build artifacts before linting
-
-### TypeScript and Type Exports
-
-- All public-facing types must be explicitly exported from the package
-- Update `src/index.ts` when adding new interfaces or types that should be available to package consumers
-- Document exported types with JSDoc comments
-- Ensure all exported types follow the naming conventions established in the codebase
-- Run `bun build` and verify type exports are correctly generated in the `dist` folder after making type-related changes
-
-### Git Workflow
-
-- Make atomic git commits that represent single logical changes
-- Write descriptive commit messages using present tense verbs
-- Always create a git commit before:
-  - Making large structural changes
-  - Modifying multiple files simultaneously
-  - Switching between features/tasks
-- Branch naming convention: `feature/short-description` or `fix/issue-reference`
-- Before opening a pull request, run `bun run ci` and regenerate schema types with `bun run generate`
-
-### Pull Request Guidelines
-
-- Use a short title written in the imperative mood (e.g., "Add feature" not "Added feature").
-- Summarize what changed and why in the description.
-- Include a **Testing** section describing the results of `bun run format`, `bun run lint`, and `bun run ci`.
-- Reference related issues or pull requests when applicable.
-
-### Biome Usage
-
-- Use [Biome](https://biomejs.dev/) for all code formatting and linting.
-- Run `bun run format` and `bun run lint` before every commit.
-- The configuration lives in `.biome.json` which excludes `node_modules`, `coverage`, and `*.lock` files
-- The CI process ensures clean builds by removing the `dist/` folder before linting to avoid conflicts with generated code
-- The Node import rule is disabled because the project uses Bun; add `// biome-ignore lint/style/useNodejsImportProtocol` for dynamic imports if needed.
-- Additional lint rules help keep the codebase clean:
-  - `complexity/noExcessiveCognitiveComplexity` warns when a function becomes too complex.
-  - `suspicious/noConsole` warns on `console` usage except for `warn`, `error`, and `info` calls.
-
-### Documentation Consistency
-
-- README snippets and `examples/*.ts` must compile against the current generated client.
-
-### Pre-commit Checklist
-
-- `bun run format` - format the code
-- `bun run lint` - fix and check lint issues
-- `bun run ci` - run tests and build
-- Write commit messages in present tense and describe the change clearly.
-
-### File Synchronization
-
-- Any changes made to `AGENTS.md` **must** also be made in `CLAUDE.md` and vice versa to keep both guideline files identical. You can run `diff AGENTS.md CLAUDE.md` to verify they're in sync.
+## File Sync
+- `AGENTS.md` and `CLAUDE.md` must be kept identical.
