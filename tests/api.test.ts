@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { GranolaClient } from "../src/client";
+import { GranolaClient } from "../src";
 
 // This is a manual test that can be run to verify API connectivity
 // Not included in automated tests because it requires a valid token

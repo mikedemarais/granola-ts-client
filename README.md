@@ -24,13 +24,13 @@ import GranolaClient from 'granola-ts-client';
 const client = new GranolaClient('your-api-token');
 
 // Get workspaces
-const workspaces = await client.getWorkspaces();
+const workspaces = await client.v1_get_workspaces();
 console.log(`Found ${workspaces.workspaces?.length} workspaces`);
 
 // Get documents from a specific workspace
-const docs = await client.getDocuments({ 
-  workspace_id: 'your-workspace-id', 
-  limit: 10 
+const docs = await client.v2_get_documents({
+  workspace_id: 'your-workspace-id',
+  limit: 10
 });
 ```
 
@@ -95,39 +95,43 @@ const client = new GranolaClient('your-access-token-here');
 
 ```ts
 // Get all workspaces
-const workspaces = await client.getWorkspaces();
+const workspaces = await client.v1_get_workspaces();
 ```
 
 ### Documents
 
 ```ts
+import { paginate } from 'granola-ts-client';
+
 // Get documents with pagination
-const docs = await client.getDocuments({ 
+const docs = await client.v2_get_documents({
   workspace_id: 'your-workspace-id',
   limit: 20,
   cursor: 'optional-pagination-cursor'
 });
 
 // Iterate through all documents with automatic pagination
-for await (const doc of client.listAllDocuments({ workspace_id: 'your-workspace-id' })) {
+for await (const doc of paginate((cursor) =>
+  client.v2_get_documents({ workspace_id: 'your-workspace-id', cursor })
+)) {
   console.log(`Document: ${doc.title}`);
 }
 
 // Get document metadata
-const metadata = await client.getDocumentMetadata('document-id');
+const metadata = await client.v1_get_document_metadata({ document_id: 'document-id' });
 
 // Get document transcript
-const transcript = await client.getDocumentTranscript('document-id');
+const transcript = await client.v1_get_document_transcript({ document_id: 'document-id' });
 
 // Update document
-await client.updateDocument({
+await client.v1_update_document({
   document_id: 'document-id',
   title: 'New Title',
   notes_markdown: '# Meeting Notes\n\nImportant points...'
 });
 
 // Update document panel
-await client.updateDocumentPanel({
+await client.v1_update_document_panel({
   document_id: 'document-id',
   panel_id: 'panel-id',
   content: { text: 'Updated content' }
@@ -138,25 +142,25 @@ await client.updateDocumentPanel({
 
 ```ts
 // Get panel templates
-const templates = await client.getPanelTemplates();
+const templates = await client.v1_get_panel_templates();
 
 // Get people data
-const people = await client.getPeople();
+const people = await client.v1_get_people();
 
 // Get feature flags
-const featureFlags = await client.getFeatureFlags();
+const featureFlags = await client.v1_get_feature_flags();
 
 // Get Notion integration details
-const notionIntegration = await client.getNotionIntegration();
+const notionIntegration = await client.v1_get_notion_integration();
 
 // Get subscription information
-const subscriptions = await client.getSubscriptions();
+const subscriptions = await client.v1_get_subscriptions();
 
 // Refresh Google Calendar events
-await client.refreshGoogleEvents();
+await client.v1_refresh_google_events();
 
 // Check for application updates
-const updateInfo = await client.checkForUpdate();
+const updateInfo = await client.v1_check_for_update_latest_mac_yml();
 ```
 
 ## Client Configuration
@@ -202,7 +206,7 @@ import GranolaClient, {
 } from 'granola-ts-client';
 
 // Use with type annotations
-const people: PeopleResponse = await client.getPeople();
+const people: PeopleResponse = await client.v1_get_people();
 
 // Use generated schema types
 type Document = components['schemas']['Document'];

@@ -22,7 +22,7 @@ async function testApiConnection() {
 
 		// Fetch workspaces
 		console.log("Fetching workspaces from Granola API...");
-		const workspaces = await client.getWorkspaces();
+		const workspaces = await client.v1_get_workspaces();
 
 		// Log the results
 		console.log("\nSuccess! Received response:");
