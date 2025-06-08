@@ -12,15 +12,8 @@ tsconfig.build.json
 .github
 .gitignore
 
-# Docs source
-docs-src
-
 # Examples
 examples
-
-# Export script and data
-export-meetings.ts
-/exports
 
 # Development files
 .DS_Store
