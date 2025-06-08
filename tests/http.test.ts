@@ -1,12 +1,5 @@
 // tests/http.test.ts
-import {
-	afterAll,
-	beforeAll,
-	beforeEach,
-	describe,
-	expect,
-	it,
-} from "bun:test";
+import { beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { Http } from "../src/http";
 
 // Set NODE_ENV for testing
