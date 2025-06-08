@@ -1,6 +1,5 @@
 # Source files (except for schema definitions)
 /src
-!/src/schema.d.ts
 
 # Test files
 /tests

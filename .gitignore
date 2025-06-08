@@ -61,3 +61,4 @@ temp/
 # Project specific
 exports/
 src/generated/
+src/schema.d.ts
