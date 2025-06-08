@@ -1,5 +1,12 @@
 {
   "$schema": "https://biomejs.dev/schemas/biome.json",
-  "linter": { "enabled": true, "rules": { "recommended": true } },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style/useNodejsImportProtocol": "off"
+    }
+  },
   "formatter": { "enabled": true }
 }
+
