@@ -195,7 +195,6 @@ import GranolaClient, {
   NotionIntegrationResponse,
   SubscriptionsResponse,
   ClientOpts,
-  HttpOpts,
   
   // Generated OpenAPI schema types
   components,
