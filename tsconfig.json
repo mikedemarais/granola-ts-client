@@ -19,6 +19,9 @@
 		"skipLibCheck": true,
 		"noFallthroughCasesInSwitch": true,
 
+		// Bun runtime types
+		"types": ["bun-types"],
+
 		// Some stricter flags (disabled by default)
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
