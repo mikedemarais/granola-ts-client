@@ -10,7 +10,7 @@ async function main() {
 		const client = new GranolaClient(token);
 
 		// Get workspaces
-		const workspaces = await client.getWorkspaces();
+		const workspaces = await client.v1_get_workspaces();
 		const workspaceCount = workspaces.workspaces?.length ?? 0;
 		console.log(`Found ${workspaceCount} workspaces`);
 
@@ -19,7 +19,7 @@ async function main() {
 			const firstWorkspace = workspaces.workspaces[0];
 			if (firstWorkspace.workspace) {
 				const workspaceId = firstWorkspace.workspace.workspace_id;
-				const docs = await client.getDocuments({
+				const docs = await client.v2_get_documents({
 					workspace_id: workspaceId,
 					limit: 5,
 				});
