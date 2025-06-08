@@ -21,10 +21,21 @@
 
 ### Code Quality
 
-- Run `bun lint` and `bun typecheck` before committing changes
+- Run `bun run dev:lint` during development (auto-fixes issues and runs tests)
+- Run `bun run ci` before committing changes to ensure all checks pass
+- Biome automatically fixes most linting and formatting issues when using `bun run lint`
 - Follow the established TypeScript configuration without modifications
 - Maintain 80%+ test coverage for all new code
 - Use async/await syntax rather than Promises with then/catch
+
+### Linting and Formatting
+
+- **Biome** is configured for both linting and formatting with auto-fix enabled
+- `bun run lint` - Auto-fixes all fixable formatting and linting issues
+- `bun run lint:check` - Checks for issues without making changes (used in CI)
+- `bun run format` - Formats code only
+- Import organization is automatically handled by Biome
+- The `dist/` folder is ignored to prevent linting generated code
 
 ### TypeScript and Type Exports
 

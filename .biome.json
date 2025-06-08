@@ -1,12 +1,15 @@
 {
-  "$schema": "https://biomejs.dev/schemas/biome.json",
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "style/useNodejsImportProtocol": "off"
-    }
-  },
-  "formatter": { "enabled": true }
+	"$schema": "https://biomejs.dev/schemas/biome.json",
+	"files": {
+		"ignore": ["dist/**"]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"style/useNodejsImportProtocol": "off"
+		}
+	},
+	"formatter": { "enabled": true },
+	"organizeImports": { "enabled": true }
 }
-

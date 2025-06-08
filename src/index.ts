@@ -6,4 +6,3 @@ export * from "./pagination";
 
 // Re-export schema types
 export type { components, paths } from "./schema";
-

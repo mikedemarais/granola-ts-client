@@ -207,14 +207,16 @@ bun install
 
 ### Available Scripts
 
-| Command              | Description                                     |
-|----------------------|-------------------------------------------------|
-| `bun run generate`   | Generate TypeScript types from `openapi.yaml`   |
-| `bun run build`      | Build ESM bundle to `dist/`                     |
-| `bun run test`       | Run tests                                       |
-| `bun run lint`       | Run biome lint checks                           |
-| `bun run format`     | Format code with biome                          |
-| `bun run ci`         | Run CI tasks manually (lint, test, build)       |
+| Command              | Description                                           |
+|----------------------|-------------------------------------------------------|
+| `bun run generate`   | Generate TypeScript types from `openapi.yaml`        |
+| `bun run build`      | Build ESM bundle to `dist/`                          |
+| `bun run test`       | Run tests                                             |
+| `bun run lint`       | Auto-fix linting and formatting issues with Biome    |
+| `bun run lint:check` | Check for linting issues without auto-fixing         |
+| `bun run format`     | Format code with Biome                               |
+| `bun run dev:lint`   | Development linting (format, auto-fix, test)         |
+| `bun run ci`         | Run full CI pipeline (format, lint-check, test, build) |
 
 ## License
 
