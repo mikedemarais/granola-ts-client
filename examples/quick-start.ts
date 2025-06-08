@@ -1,4 +1,4 @@
-import GranolaClient from "../src/index";
+import GranolaClient from "granola-ts-client";
 
 // Example usage of the client
 async function main() {
