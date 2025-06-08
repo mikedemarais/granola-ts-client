@@ -139,8 +139,11 @@ export class GranolaClient {
       }
       
       // Dynamically import required modules
+      // biome-ignore lint/style/useNodejsImportProtocol: TypeScript build lacks Node type definitions
       const fs = await import('fs');
+      // biome-ignore lint/style/useNodejsImportProtocol: TypeScript build lacks Node type definitions
       const path = await import('path');
+      // biome-ignore lint/style/useNodejsImportProtocol: TypeScript build lacks Node type definitions
       const os = await import('os');
       
       // Path to Granola app support directory (macOS only)

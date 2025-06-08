@@ -26,15 +26,15 @@
     "build:types": "tsc -p tsconfig.build.json",
     "build:schema": "cp src/schema.d.ts dist/",
     "test": "bun test",
-    "format": "biome format . --write",
+    "format": "biome format --write .",
     "lint": "biome check .",
-    "ci": "bun run lint && bun run test && bun run build",
+    "ci": "bun run format && bun run lint && bun run test && bun run build",
     "prepublishOnly": "bun run ci"
   },
   "dependencies": {},
   "devDependencies": {
     "@types/bun": "latest",
-    "biome": "^0.3.3",
+    "@biomejs/biome": "latest",
     "openapi-typescript": "^7.6.1",
     "typescript": "^5.0.0"
   },
