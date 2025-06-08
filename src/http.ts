@@ -138,22 +138,4 @@ export class Http {
 	public post<T>(path: string, body?: unknown): Promise<T> {
 		return this.request<T>("POST", path, body);
 	}
-
-	public async getText(path: string): Promise<string> {
-		const cleanPath = path.replace(/^\//, "");
-		const url = `${this.baseUrl}/${cleanPath}`;
-		const controller = new AbortController();
-		const timer = setTimeout(() => controller.abort(), this.timeout);
-		const res = await fetch(url, {
-			method: "GET",
-			headers: this.buildHeaders(),
-			signal: controller.signal,
-		});
-		clearTimeout(timer);
-		if (!res.ok) {
-			const text = await res.text();
-			throw new Error(`HTTP ${res.status} ${res.statusText}: ${text}`);
-		}
-		return res.text();
-	}
 }
