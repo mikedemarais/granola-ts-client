@@ -216,7 +216,7 @@ bun install
 | `bun run lint:check` | Check for linting issues without auto-fixing         |
 | `bun run format`     | Format code with Biome                               |
 | `bun run dev:lint`   | Development linting (format, auto-fix, test)         |
-| `bun run ci`         | Run full CI pipeline (format, lint-check, test, build) |
+| `bun run ci`         | Run full CI pipeline (clean, format, lint-check, test, build) |
 
 ## License
 

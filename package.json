@@ -26,7 +26,7 @@
 		"lint": "biome check --fix .",
 		"lint:check": "biome check .",
 		"dev:lint": "bun run format && bun run lint && bun run test",
-		"ci": "bun run format && bun run lint:check && bun run test && bun run build",
+		"ci": "rm -rf dist && bun run format && bun run lint:check && bun run test && bun run build",
 		"prepublishOnly": "bun run ci"
 	},
 	"dependencies": {},

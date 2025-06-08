@@ -1,7 +1,7 @@
 {
 	"$schema": "https://biomejs.dev/schemas/biome.json",
 	"files": {
-		"ignore": ["dist/**"]
+		"ignore": ["node_modules", "coverage", "*.lock", "dist"]
 	},
 	"linter": {
 		"enabled": true,
