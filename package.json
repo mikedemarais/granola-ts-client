@@ -22,9 +22,9 @@
 		"build:types": "tsc -p tsconfig.build.json",
 		"test": "bun test",
 		"format": "biome format --write .",
-		"lint": "rm -rf dist && biome check --fix src/{index,http,pagination}.ts tests examples",
-		"lint:check": "rm -rf dist && biome check src/{index,http,pagination}.ts tests examples",
-		"dev:lint": "bun run format && bun run lint && bun run test",
+		"lint": "biome check --fix src/{index,http,pagination}.ts tests examples",
+		"lint:check": "biome check src/{index,http,pagination}.ts tests examples",
+		"dev": "bun run format && bun run lint && bun run test",
 		"ci": "rm -rf dist && bun run format && bun run lint:check && bun run test && bun run build",
 		"prepublishOnly": "bun run ci"
 	},
