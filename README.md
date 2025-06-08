@@ -224,12 +224,18 @@ This project uses [Bun](https://bun.sh) as the JavaScript/TypeScript runtime.
 bun install
 ```
 
+### Generating Types
+
+Run `bun run generate` to update the TypeScript definitions from `openapi.yaml`.
+The CI workflow in `.github/workflows/ci.yml` runs this command before it
+builds the package with `bun run build`.
+
 ### Available Scripts
 
 | Command              | Description                                           |
 |----------------------|-------------------------------------------------------|
 | `bun run generate`   | Generate TypeScript types from `openapi.yaml`        |
-| `bun run build`      | Generate schema, build ESM bundle, and create type definitions |
+| `bun run build`      | Compile the package, copy the generated schema, and create type definitions |
 | `bun run test`       | Run tests                                             |
 | `bun run lint`       | Auto-fix linting and formatting issues with Biome    |
 | `bun run lint:check` | Check for linting issues without auto-fixing         |
