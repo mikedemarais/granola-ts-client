@@ -179,7 +179,7 @@ bun install
 | Command              | Description                                           |
 |----------------------|-------------------------------------------------------|
 | `bun run generate`   | Generate TypeScript types from `openapi.yaml`        |
-| `bun run build`      | Build ESM bundle to `dist/`                          |
+| `bun run build`      | Generate schema, build ESM bundle, and create type definitions |
 | `bun run test`       | Run tests                                             |
 | `bun run lint`       | Auto-fix linting and formatting issues with Biome    |
 | `bun run lint:check` | Check for linting issues without auto-fixing         |
