@@ -216,7 +216,7 @@ let workspace: WorkspaceResponse;
 ```
 ## Generate Types
 
-Run `bun run generate` to refresh types from `openapi.yaml`. The command writes
+Run `bun run generate` to refresh client and schema types from `openapi.yaml`. The command writes
 the API client and models to `src/generated/`, which are committed to the
 repository. CI runs this step automatically before building.
 
