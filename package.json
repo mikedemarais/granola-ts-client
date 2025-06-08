@@ -1,71 +1,67 @@
 {
-  "name": "granola-ts-client",
-  "version": "0.7.0",
-  "description": "TypeScript client for the Granola API with automatic client validation bypass",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "types": "./dist/index.d.ts",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "generate": "openapi-typescript openapi.yaml -o src/schema.d.ts",
-    "generate:client": "bun scripts/generate-client.ts",
-    "build": "bun build src/index.ts --outdir dist && bun run build:types && bun run build:schema",
-    "build:types": "tsc -p tsconfig.build.json",
-    "build:schema": "cp src/schema.d.ts dist/",
-    "test": "bun test",
-    "format": "biome format --write .",
-    "lint": "biome check --fix .",
-    "lint:check": "biome check .",
-    "dev:lint": "bun run format && bun run lint && bun run test",
-    "ci": "rm -rf dist && bun run format && bun run lint:check && bun run test && bun run build",
-    "prepublishOnly": "bun run ci"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@biomejs/biome": "latest",
-    "openapi-typescript": "^7.6.1",
-    "typescript": "^5.0.0"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "keywords": [
-    "granola",
-    "api",
-    "client",
-    "typescript",
-    "meetings",
-    "notes",
-    "official-client",
-    "compatibility",
-    "macos"
-  ],
-  "author": "Mike Demarais",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mikedemarais/granola-ts-client.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mikedemarais/granola-ts-client/issues"
-  },
-  "homepage": "https://github.com/mikedemarais/granola-ts-client#readme"
+	"name": "granola-ts-client",
+	"version": "0.7.0",
+	"description": "TypeScript client for the Granola API with automatic client validation bypass",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "./dist/index.d.ts",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"files": ["dist", "README.md", "LICENSE"],
+	"scripts": {
+		"generate": "openapi-typescript openapi.yaml -o src/schema.d.ts",
+		"generate:client": "bun scripts/generate-client.ts",
+		"build": "bun build src/index.ts --outdir dist && bun run build:types && bun run build:schema",
+		"build:types": "tsc -p tsconfig.build.json",
+		"build:schema": "cp src/schema.d.ts dist/",
+		"test": "bun test",
+		"format": "biome format --write .",
+		"lint": "biome check --fix .",
+		"lint:check": "biome check .",
+		"dev:lint": "bun run format && bun run lint && bun run test",
+		"ci": "rm -rf dist && bun run format && bun run lint:check && bun run test && bun run build",
+		"prepublishOnly": "bun run ci"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@biomejs/biome": "latest",
+		"openapi-typescript": "^7.6.1",
+		"typescript": "^5.0.0"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"engines": {
+		"node": ">=16.0.0"
+	},
+	"keywords": [
+		"granola",
+		"api",
+		"client",
+		"typescript",
+		"meetings",
+		"notes",
+		"official-client",
+		"compatibility",
+		"macos"
+	],
+	"author": "Mike Demarais",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mikedemarais/granola-ts-client.git"
+	},
+	"bugs": {
+		"url": "https://github.com/mikedemarais/granola-ts-client/issues"
+	},
+	"homepage": "https://github.com/mikedemarais/granola-ts-client#readme"
 }

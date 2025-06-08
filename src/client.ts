@@ -106,26 +106,26 @@ export interface ClientOpts extends HttpOpts {
 export class GranolaClient {
 	private http: Http;
 
-  /**
-   * Create a new GranolaClient.
-   * @param token API authentication token
-   * @param opts HTTP and client options
-   * @example
-   * ```ts
-   * const client = new GranolaClient('your_token');
-   * 
-   * // Client with custom identification
-   * const client = new GranolaClient('your_token', {
-   *   appVersion: '6.5.0',
-   *   clientType: 'electron',
-   *   clientPlatform: 'darwin',
-   *   clientArchitecture: 'arm64'
-   * });
-   * ```
-   */
-  constructor(token: string, opts: ClientOpts = {}) {
-    this.http = new Http(token, opts.baseUrl, opts);
-  }
+	/**
+	 * Create a new GranolaClient.
+	 * @param token API authentication token
+	 * @param opts HTTP and client options
+	 * @example
+	 * ```ts
+	 * const client = new GranolaClient('your_token');
+	 *
+	 * // Client with custom identification
+	 * const client = new GranolaClient('your_token', {
+	 *   appVersion: '6.5.0',
+	 *   clientType: 'electron',
+	 *   clientPlatform: 'darwin',
+	 *   clientArchitecture: 'arm64'
+	 * });
+	 * ```
+	 */
+	constructor(token: string, opts: ClientOpts = {}) {
+		this.http = new Http(token, opts.baseUrl, opts);
+	}
 
 	/**
 	 * Retrieve all workspaces for the user.
