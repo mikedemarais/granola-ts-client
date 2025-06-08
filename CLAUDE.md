@@ -27,7 +27,7 @@
 - Biome automatically fixes most linting and formatting issues when using `bun run lint`
 - The CI process uses a clean build approach: removes dist/, lints source code, runs tests, then builds
 - Follow the established TypeScript configuration without modifications
-- Maintain 80%+ test coverage for all new code
+- Do not impose a strict test coverage quota on contributions
 - Use async/await syntax rather than Promises with then/catch
 
 ### Linting and Formatting
