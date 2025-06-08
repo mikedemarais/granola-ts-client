@@ -6,6 +6,7 @@
 - **Language**: TypeScript is required for all new code
 - **Package Management**: Use Bun's built-in package manager (`bun install`) instead of npm
 - **Testing**: Use Bun's test runner (`bun test`) for all unit and integration tests
+- Always invoke binaries with `bun x` instead of the deprecated `bunx` alias
 
 ## Development Practices
 

@@ -17,7 +17,7 @@
 	"module": "./dist/index.js",
 	"files": ["dist", "README.md", "LICENSE"],
 	"scripts": {
-		"generate": "bunx openapi-typescript-codegen --input openapi.yaml --output src/generated --client fetch",
+		"generate": "bun x openapi-typescript-codegen --input openapi.yaml --output src/generated --client fetch",
 		"build": "bun run generate && bun build src/index.ts --outdir dist && bun run build:types",
 		"build:types": "tsc -p tsconfig.build.json",
 		"test": "bun test",
