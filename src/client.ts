@@ -51,7 +51,7 @@ class GranolaClientImpl {
 
 	constructor(token?: string, baseUrl?: string, opts?: HttpOpts) {
 		this.internal = new InternalClient(token, baseUrl, opts);
-		
+
 		// Bind all methods to ensure they work when destructured
 		this.setToken = this.setToken.bind(this);
 		this.getWorkspaces = this.getWorkspaces.bind(this);
