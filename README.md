@@ -1,293 +1,150 @@
 # granola-ts-client
 
-Unofficial TypeScript client for the Granola API. It mimics the desktop app to avoid "Unsupported client" errors.
+TypeScript client for the Granola API.
 
 ## Installation
 
 ```bash
-# using npm
 npm install granola-ts-client
-
-# using yarn
-yarn add granola-ts-client
-
-# using bun
-bun add granola-ts-client
 ```
 
 ## Quick Start
 
-```ts
+```typescript
 import GranolaClient from 'granola-ts-client';
 
-// Initialize with your API token
+const client = new GranolaClient('your-api-token');
+
+// Get all documents
+for await (const doc of client.listAllDocuments({ workspace_id: 'abc-123' })) {
+  console.log(doc.title);
+}
+```
+
+## API Reference
+
+### Core Methods
+
+- `getWorkspaces()` - Get user workspaces
+- `getDocuments(options)` - Get documents with pagination
+- `getDocumentMetadata(id)` - Get document metadata
+- `getDocumentTranscript(id)` - Get document transcript
+- `updateDocument(id, updates)` - Update document
+- `updateDocumentPanel(id, panelId, content)` - Update document panel
+- `getPanelTemplates()` - Get available panel templates
+- `listAllDocuments(options)` - Iterate all documents (async generator)
+
+### Other Methods
+
+- `getPeople()` - Get people data
+- `getFeatureFlags()` - Get feature flags
+- `getNotionIntegration()` - Get Notion integration details
+- `getSubscriptions()` - Get subscription information
+- `refreshGoogleEvents()` - Refresh Google Calendar events
+- `checkForUpdate()` - Check for app updates
+
+> **Backwards Compatibility**: Legacy method names (e.g., `v1_get_workspaces`) are supported automatically.
+
+## Examples
+
+### Basic Usage
+
+```typescript
+import GranolaClient from 'granola-ts-client';
+
 const client = new GranolaClient('your-api-token');
 
 // Get workspaces
-const workspaces = await client.v1_get_workspaces();
-console.log(`Found ${workspaces.workspaces?.length} workspaces`);
-
-// Get documents from a specific workspace
-const docs = await client.v2_get_documents({
-  workspace_id: 'your-workspace-id',
-  limit: 10
-});
-```
-Below is a runnable example that loads your access token from the `GRANOLA_ACCESS_TOKEN` environment variable and prints a few documents from the first workspace.
-
-```ts
-import GranolaClient from 'granola-ts-client';
-
-async function main() {
-  try {
-    const token = process.env.GRANOLA_ACCESS_TOKEN;
-    if (!token) {
-      throw new Error('GRANOLA_ACCESS_TOKEN env var not set');
-    }
-    const client = new GranolaClient(token);
-
-    // Get workspaces
-    const workspaces = await client.v1_get_workspaces();
-    const workspaceCount = workspaces.workspaces?.length ?? 0;
-    console.info(`Found ${workspaceCount} workspaces`);
-
-    // Get documents from the first workspace
-    if (workspaces.workspaces && workspaces.workspaces.length > 0) {
-      const firstWorkspace = workspaces.workspaces[0];
-      if (firstWorkspace.workspace) {
-        const workspaceId = firstWorkspace.workspace.workspace_id;
-        const docs = await client.v2_get_documents({
-          workspace_id: workspaceId,
-          limit: 5,
-        });
-
-        console.info(`First 5 documents in workspace ${workspaceId}:`);
-        if (docs.docs && docs.docs.length > 0) {
-          for (const doc of docs.docs) {
-            console.info(`- ${doc.title} (${doc.id})`);
-          }
-        } else {
-          console.info('No documents found');
-        }
-      }
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
-main();
-```
-
-## Get Granola Access Token
-
-Grab a Granola access token using one of these methods:
-
-### Method 1: Local App
-
-- Use `jq` to read the token from `supabase.json`:
-
-  ```bash
-  # macOS
-  jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/Library/Application Support/Granola/supabase.json"
-
-  # Linux
-  jq -r '.cognito_tokens | fromjson | .access_token' "$HOME/.config/Granola/supabase.json"
-  ```
-
-- Or extract it in code:
-
-  ```ts
-  import { join } from 'path';
-  import { homedir } from 'os';
-  import GranolaClient from 'granola-ts-client';
-
-  const granolaPath = process.platform === 'darwin'
-    ? join(homedir(), 'Library/Application Support/Granola/supabase.json')
-    : join(homedir(), '.config/Granola/supabase.json');
-
-  const data = await Bun.file(granolaPath).json();
-  const accessToken = JSON.parse(data.cognito_tokens).access_token;
-  const client = new GranolaClient(accessToken);
-  ```
-
-### Method 2: Browser DevTools
-
-- Visit [granola.ai](https://granola.ai) and log in.
-- Open DevTools (F12 or Cmd+Option+I).
-- In the **Network** tab, navigate within the app.
-- Grab the `Authorization` header from any `api.granola.ai` request.
-
-## Authentication
-
-Once you have your token, initialize the client:
-
-```ts
-import GranolaClient from 'granola-ts-client';
-
-const client = new GranolaClient('your-access-token-here');
-```
-
-## API Methods
-
-### Workspaces
-
-```ts
-// Get all workspaces
-const workspaces = await client.v1_get_workspaces();
-```
-
-### Documents
-
-```ts
-import { paginate } from 'granola-ts-client';
+const workspaces = await client.getWorkspaces();
+console.log(`Found ${workspaces.workspaces.length} workspaces`);
 
 // Get documents with pagination
-const docs = await client.v2_get_documents({
-  workspace_id: 'your-workspace-id',
-  limit: 20,
-  cursor: 'optional-pagination-cursor'
+const docs = await client.getDocuments({ 
+  workspace_id: workspaces.workspaces[0].id,
+  limit: 10 
 });
 
-// Iterate through all documents with automatic pagination
-for await (const doc of paginate((cursor) =>
-  client.v2_get_documents({ workspace_id: 'your-workspace-id', cursor })
-)) {
-  console.log(`Document: ${doc.title}`);
+// Get document details
+const metadata = await client.getDocumentMetadata(docs.docs[0].id);
+const transcript = await client.getDocumentTranscript(docs.docs[0].id);
+
+// Update a document
+await client.updateDocument(docs.docs[0].id, {
+  title: 'Updated Title',
+  notes_markdown: '# Notes\n\nUpdated content'
+});
+```
+
+### Iterate All Documents
+
+```typescript
+// Process all documents in a workspace
+for await (const doc of client.listAllDocuments({ workspace_id: 'abc-123' })) {
+  console.log(`Processing: ${doc.title}`);
+  // Process each document
 }
 
-// Get document metadata
-const metadata = await client.v1_get_document_metadata({ document_id: 'document-id' });
-
-// Get document transcript
-const transcript = await client.v1_get_document_transcript({ document_id: 'document-id' });
-
-// Update document
-await client.v1_update_document({
-  document_id: 'document-id',
-  title: 'New Title',
-  notes_markdown: '# Meeting Notes\n\nImportant points...'
-});
-
-// Update document panel
-await client.v1_update_document_panel({
-  document_id: 'document-id',
-  panel_id: 'panel-id',
-  content: { text: 'Updated content' }
-});
+// Or collect into an array
+const allDocs = [];
+for await (const doc of client.listAllDocuments({ workspace_id: 'abc-123' })) {
+  allDocs.push(doc);
+}
 ```
 
-### Other APIs
+## Getting a Granola Access Token
 
-```ts
-// Get panel templates
-const templates = await client.v1_get_panel_templates();
+### From Local App
 
-// Get people data
-const people = await client.v1_get_people();
+```bash
+# macOS - Try WorkOS token first (new auth)
+jq -r '.workos_tokens | fromjson | .access_token' \
+  "$HOME/Library/Application Support/Granola/supabase.json"
 
-// Get feature flags
-const featureFlags = await client.v1_get_feature_flags();
+# macOS - Fall back to Cognito token (legacy)
+jq -r '.cognito_tokens | fromjson | .access_token' \
+  "$HOME/Library/Application Support/Granola/supabase.json"
 
-// Get Notion integration details
-const notionIntegration = await client.v1_get_notion_integration();
-
-// Get subscription information
-const subscriptions = await client.v1_get_subscriptions();
-
-// Refresh Google Calendar events
-await client.v1_refresh_google_events();
-
-// Check for application updates
-const updateInfo = await client.v1_check_for_update_latest_mac_yml();
+# Linux
+jq -r '.workos_tokens | fromjson | .access_token' \
+  "$HOME/.config/Granola/supabase.json"
 ```
 
-## Client Config
+### Using the Optional Token Utility
 
-The client pretends to be the desktop app so API calls are accepted. Override these values if needed:
+```typescript
+import { extractGranolaToken } from 'granola-ts-client/utils';
 
-```ts
-const client = new GranolaClient('your-api-token', {
-  // API configuration
-  baseUrl: 'https://api.granola.ai',
-  timeout: 10000,
-  retries: 3,
-
-  // Client identification (defaults shown)
-  appVersion: '6.4.0',
-  clientType: 'electron',
-  clientPlatform: 'darwin',
-  clientArchitecture: 'arm64',
-  electronVersion: '33.4.5',
-  chromeVersion: '130.0.6723.191',
-  nodeVersion: '20.18.3',
-  osVersion: '15.3.1',
-  osBuild: '24D70',
-});
+const token = await extractGranolaToken();
+const client = new GranolaClient(token);
 ```
 
-## HTTP Utility
+### From Web App
 
-All generated API calls use the `Http` class defined in
-[`src/http.ts`](src/http.ts) for network communication. Import and use this
-class directly if you need to make custom requests that the generated client
-doesn't expose.
+Open developer console at [app.granola.so](https://app.granola.so) and run:
 
-## Types
-
-All types are fully exported for use in your TypeScript code:
-
-```ts
-import GranolaClient, {
-  // Exported interfaces
-  PeopleResponse,
-  FeatureFlagsResponse,
-  NotionIntegrationResponse,
-  SubscriptionsResponse,
-  ClientOpts,
-
-  // Generated API models
-  Document,
-  WorkspaceResponse,
-} from 'granola-ts-client';
-
-// Use with type annotations
-const people: PeopleResponse = await client.v1_get_people();
-
-// Use generated models
-let doc: Document;
-let workspace: WorkspaceResponse;
+```javascript
+await cookieStore.get('access_token')
 ```
-## Generate Types
-
-Run `bun run generate` to refresh client and schema types from `openapi.yaml`.
-The command writes the API client and models to `src/generated/`, which is
-ignored by git. CI runs this step automatically before building.
-
 
 ## Development
 
-### Requirements
-
-Install dependencies with [Bun](https://bun.sh):
-
 ```bash
+# Install dependencies
 bun install
+
+# Run tests
+bun test
+
+# Build
+bun run build
+
+# Generate from OpenAPI spec
+bun run generate
 ```
 
+## Architecture
 
-### Scripts
-
-| Command              | Description                                           |
-|----------------------|-------------------------------------------------------|
-| `bun run generate`   | Generate client and models from `openapi.yaml`       |
-| `bun run build`      | Generate client, build ESM bundle, and create type definitions |
-| `bun run test`       | Run tests                                             |
-| `bun run lint`       | Auto-fix linting and formatting issues with Biome    |
-| `bun run lint:check` | Check for linting issues without auto-fixing         |
-| `bun run format`     | Format code with Biome                               |
-| `bun run dev`        | Development linting (format, auto-fix, test)         |
-| `bun run ci`         | Run full CI pipeline (clean, format, lint-check, test, build) |
+This library uses a stable wrapper pattern to protect against breaking changes from code generation. The public API methods (`getWorkspaces`, `getDocuments`, etc.) will never change, ensuring your code continues to work even when we regenerate the underlying client.
 
 ## License
 

@@ -1,6 +1,6 @@
 {
 	"name": "granola-ts-client",
-	"version": "0.10.0",
+	"version": "0.11.0",
 	"description": "TypeScript client for the Granola API with automatic client validation bypass",
 	"type": "module",
 	"exports": {
@@ -10,6 +10,12 @@
 			"require": "./dist/index.js",
 			"default": "./dist/index.js"
 		},
+		"./utils": {
+			"types": "./dist/utils/token-extractor.d.ts",
+			"import": "./dist/utils/token-extractor.js",
+			"require": "./dist/utils/token-extractor.js",
+			"default": "./dist/utils/token-extractor.js"
+		},
 		"./package.json": "./package.json"
 	},
 	"types": "./dist/index.d.ts",
@@ -17,13 +23,13 @@
 	"module": "./dist/index.js",
 	"files": ["dist", "README.md", "LICENSE"],
 	"scripts": {
-		"generate": "bun x openapi-typescript-codegen --input openapi.yaml --output src/generated --client fetch && bun x openapi-typescript openapi.yaml -o src/schema.d.ts",
-		"build": "bun run generate && bun build src/index.ts --outdir dist && bun run build:types",
+		"generate": "bun x openapi-typescript-codegen --input openapi.yaml --output src/internal/generated --client fetch && bun x openapi-typescript openapi.yaml -o src/schema.d.ts",
+		"build": "bun run generate && bun build src/index.ts --outdir dist && bun build src/utils/token-extractor.ts --outdir dist/utils --target node && bun run build:types",
 		"build:types": "tsc -p tsconfig.build.json",
 		"test": "bun test",
 		"format": "biome format --write .",
-		"lint": "biome check --fix src/{index,http,pagination}.ts tests",
-		"lint:check": "biome check src/{index,http,pagination}.ts tests",
+		"lint": "biome check --fix src/{index,http,pagination,client}.ts tests",
+		"lint:check": "biome check src/{index,http,pagination,client}.ts tests",
 		"dev": "bun run format && bun run lint && bun run test",
 		"ci": "rm -rf dist && bun run format && bun run lint:check && bun run test && bun run build",
 		"prepublishOnly": "bun run ci"
