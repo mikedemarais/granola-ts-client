@@ -1,10 +1,12 @@
 // src/index.ts
-// Export generated API client
-export * from "./generated";
-export {
-	DefaultService as GranolaClient,
-	DefaultService as default,
-} from "./generated";
 
+// Export all types from centralized location
+export * from "./types";
+
+// Export client
+export { GranolaClient } from "./client";
+export { GranolaClient as default } from "./client";
+
+// Export utilities
 export * from "./http";
 export * from "./pagination";
