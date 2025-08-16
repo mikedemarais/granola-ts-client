@@ -27,6 +27,13 @@ export class GranolaClient {
 	}
 
 	/**
+	 * Check if authentication token is set
+	 */
+	hasToken(): boolean {
+		return this.http.hasToken();
+	}
+
+	/**
 	 * Get workspaces for the authenticated user
 	 */
 	async v1_get_workspaces(

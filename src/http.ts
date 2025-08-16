@@ -54,6 +54,19 @@ export class Http {
 		this.token = token;
 	}
 
+	public hasToken(): boolean {
+		return !!this.token;
+	}
+
+	private ensureAuthenticated(): void {
+		if (!this.token) {
+			throw new Error(
+				"Authentication required. Please provide a token via " +
+					"constructor or call setToken() before making API calls.",
+			);
+		}
+	}
+
 	private buildHeaders(contentType?: string): Record<string, string> {
 		const headers: Record<string, string> = {};
 		if (contentType) headers["Content-Type"] = contentType;
@@ -76,6 +89,9 @@ export class Http {
 		path: string,
 		body?: unknown,
 	): Promise<T> {
+		// Ensure authentication before making any API calls
+		this.ensureAuthenticated();
+
 		const cleanPath = path.replace(/^\//, "");
 		const url = `${this.baseUrl}/${cleanPath}`;
 		let lastError: unknown;
