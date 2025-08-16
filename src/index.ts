@@ -4,7 +4,7 @@
 export * from "./types";
 
 // Export client
-export { GranolaClient } from "./client";
+export { GranolaClient, type ClientOptions } from "./client";
 export { GranolaClient as default } from "./client";
 
 // Export utilities

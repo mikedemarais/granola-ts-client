@@ -13,6 +13,20 @@ import type {
 } from "./internal/generated";
 import { GranolaClient as InternalClient } from "./internal/manual-client";
 
+/**
+ * Options for creating a GranolaClient instance.
+ */
+export interface ClientOptions {
+	/** API token for authentication */
+	apiKey?: string;
+	/** Alternative property name for token (backwards compatibility) */
+	token?: string;
+	/** Base URL for the API (default: https://api.granola.ai) */
+	baseUrl?: string;
+	/** Additional HTTP options */
+	httpOpts?: HttpOpts;
+}
+
 // Map old method names to new ones for backwards compatibility
 const METHOD_ALIASES: Record<string, string> = {
 	v1_get_workspaces: "getWorkspaces",
@@ -49,8 +63,49 @@ const METHOD_ALIASES: Record<string, string> = {
 class GranolaClientImpl {
 	private internal: InternalClient;
 
-	constructor(token?: string, baseUrl?: string, opts?: HttpOpts) {
-		this.internal = new InternalClient(token, baseUrl, opts);
+	constructor(
+		tokenOrOptions?: string | ClientOptions,
+		baseUrl?: string,
+		opts?: HttpOpts,
+	) {
+		let resolvedToken: string | undefined;
+		let resolvedBaseUrl: string | undefined;
+		let resolvedOpts: HttpOpts | undefined;
+
+		// Handle v0.3.0 style: new GranolaClient(token)
+		if (typeof tokenOrOptions === "string") {
+			resolvedToken = tokenOrOptions;
+			resolvedBaseUrl = baseUrl;
+			resolvedOpts = opts;
+		}
+		// Handle v0.11.0 style with options object
+		else if (tokenOrOptions && typeof tokenOrOptions === "object") {
+			// Support both apiKey and token properties
+			resolvedToken = tokenOrOptions.apiKey || tokenOrOptions.token;
+			resolvedBaseUrl = tokenOrOptions.baseUrl || baseUrl;
+			resolvedOpts = tokenOrOptions.httpOpts || opts;
+		}
+		// Handle no arguments (will need setToken)
+		else {
+			resolvedToken = undefined;
+			resolvedBaseUrl = baseUrl;
+			resolvedOpts = opts;
+		}
+
+		this.internal = new InternalClient(
+			resolvedToken,
+			resolvedBaseUrl,
+			resolvedOpts,
+		);
+
+		// Warn if no token provided
+		if (!resolvedToken) {
+			console.warn(
+				"GranolaClient: No authentication token provided. " +
+					'API calls will fail. Use new GranolaClient("token") or ' +
+					'new GranolaClient({ apiKey: "token" }) or call setToken(token) before making API calls.',
+			);
+		}
 
 		// Bind all methods to ensure they work when destructured
 		this.setToken = this.setToken.bind(this);
@@ -97,6 +152,12 @@ class GranolaClientImpl {
 		const response = await this.internal.v1_get_document_transcript({
 			document_id: documentId,
 		});
+
+		// If response is undefined but we should have authentication, throw a meaningful error
+		if (response === undefined && !this.internal.hasToken()) {
+			throw new Error("Authentication required to fetch transcript");
+		}
+
 		return response?.transcript || [];
 	}
 
@@ -127,6 +188,12 @@ class GranolaClientImpl {
 	/** Get panel templates */
 	async getPanelTemplates(body = {}): Promise<PanelTemplate[]> {
 		const response = await this.internal.v1_get_panel_templates(body);
+
+		// If response is undefined but we should have authentication, throw a meaningful error
+		if (response === undefined && !this.internal.hasToken()) {
+			throw new Error("Authentication required to fetch panel templates");
+		}
+
 		return response?.panel_templates || [];
 	}
 
