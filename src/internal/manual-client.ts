@@ -76,8 +76,9 @@ export class GranolaClient {
 		document_id: string;
 		// biome-ignore lint/suspicious/noExplicitAny: API accepts additional fields
 		[key: string]: any;
-	}): Promise<{ transcript?: TranscriptSegment[] }> {
-		return this.http.post<{ transcript?: TranscriptSegment[] }>(
+	}): Promise<TranscriptSegment[]> {
+		// API returns array directly, not wrapped in object
+		return this.http.post<TranscriptSegment[]>(
 			"/v1/get-document-transcript",
 			body,
 		);
@@ -118,11 +119,9 @@ export class GranolaClient {
 	async v1_get_panel_templates(
 		// biome-ignore lint/suspicious/noExplicitAny: API accepts arbitrary fields
 		body: Record<string, any> = {},
-	): Promise<{ panel_templates?: PanelTemplate[] }> {
-		return this.http.post<{ panel_templates?: PanelTemplate[] }>(
-			"/v1/get-panel-templates",
-			body,
-		);
+	): Promise<PanelTemplate[]> {
+		// API returns array directly, not wrapped in object
+		return this.http.post<PanelTemplate[]>("/v1/get-panel-templates", body);
 	}
 
 	/**

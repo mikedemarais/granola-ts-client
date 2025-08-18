@@ -158,7 +158,8 @@ class GranolaClientImpl {
 			throw new Error("Authentication required to fetch transcript");
 		}
 
-		return response?.transcript || [];
+		// API returns array directly
+		return response || [];
 	}
 
 	/** Update a document */
@@ -194,7 +195,8 @@ class GranolaClientImpl {
 			throw new Error("Authentication required to fetch panel templates");
 		}
 
-		return response?.panel_templates || [];
+		// API returns array directly
+		return response || [];
 	}
 
 	/** Get people data */

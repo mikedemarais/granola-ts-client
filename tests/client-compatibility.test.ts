@@ -208,12 +208,10 @@ describe("GranolaClient backwards compatibility", () => {
 
 		it("should support old v1_get_document_transcript method name", async () => {
 			const mockFetch = async () => {
-				return new Response(
-					JSON.stringify({
-						transcript: [{ text: "Hello", timestamp: 0 }],
-					}),
-					{ status: 200 },
-				);
+				// API returns array directly now
+				return new Response(JSON.stringify([{ text: "Hello", timestamp: 0 }]), {
+					status: 200,
+				});
 			};
 			// @ts-ignore - mock fetch for testing
 			globalThis.fetch = mockFetch;
@@ -224,14 +222,18 @@ describe("GranolaClient backwards compatibility", () => {
 				document_id: "doc1",
 			});
 			expect(result).toBeDefined();
+			// Legacy method name returns wrapped response for backwards compatibility
+			expect(result.transcript).toBeDefined();
 			expect(result.transcript).toHaveLength(1);
+			expect(result.transcript[0].text).toBe("Hello");
 		});
 	});
 
 	describe("Error handling", () => {
 		it("should provide meaningful error for empty transcript response", async () => {
 			const mockFetch = async () => {
-				return new Response(JSON.stringify({}), { status: 200 });
+				// API returns empty array when no transcript
+				return new Response(JSON.stringify([]), { status: 200 });
 			};
 			// @ts-ignore - mock fetch for testing
 			globalThis.fetch = mockFetch;
@@ -243,7 +245,8 @@ describe("GranolaClient backwards compatibility", () => {
 
 		it("should provide meaningful error for empty panel templates response", async () => {
 			const mockFetch = async () => {
-				return new Response(JSON.stringify({}), { status: 200 });
+				// API returns empty array when no templates
+				return new Response(JSON.stringify([]), { status: 200 });
 			};
 			// @ts-ignore - mock fetch for testing
 			globalThis.fetch = mockFetch;

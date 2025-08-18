@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.2] - 2024-01-16
+
+### Fixed
+- **Critical**: Fixed `getDocumentTranscript` returning empty array when transcripts exist
+- **Critical**: Fixed `getPanelTemplates` returning empty array when templates exist
+- Both methods now correctly handle API responses that return arrays directly instead of wrapped objects
+- Updated internal client types to match actual API response structure
+
+### Added
+- Comprehensive tests for API response handling
+- Tests verify both methods handle arrays, empty arrays, and null responses correctly
+
+### Technical Details
+- API endpoints `/v1/get-document-transcript` and `/v1/get-panel-templates` return arrays directly
+- Fixed incorrect expectation of wrapped responses (`{transcript: [...]}` and `{panel_templates: [...]}`)
+- Maintains backwards compatibility for legacy method names through Proxy wrapper
+
 ## [0.11.1] - 2024-01-16
 
 ### Fixed
